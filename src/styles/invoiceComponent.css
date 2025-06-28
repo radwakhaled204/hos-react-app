@@ -209,7 +209,7 @@ select {
   font-size: 14px;
 }
 .table-scroll-wrapper {
-  max-height: 200px;    
+  max-height: 190px;    
   overflow-x: auto;       
   overflow-y: hidden;      
   border: 1px solid #ccc;
