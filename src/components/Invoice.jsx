@@ -1,6 +1,7 @@
 
 
 import React, { useState } from "react";
+import "../styles/invoiceComponent.css"; 
 
 const Invoice = () => {
 
