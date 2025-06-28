@@ -1,11 +1,8 @@
 
 
 import React, { useState } from "react";
-import "../styles/app.css";
-import { useNavigate } from "react-router-dom";
 
-const Invoice = ({ onChange }) => {
-  const navigate = useNavigate();
+const Invoice = () => {
 
   const [rows, setRows] = useState([
     {
@@ -43,10 +40,6 @@ const Invoice = ({ onChange }) => {
   };
 
 
-
-  const goToInvoice = () => {
-    navigate("/invoice");
-  };
 
   return (
     <div className="header">
