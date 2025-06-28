@@ -377,3 +377,49 @@ select {
     flex-wrap: wrap;
   }
 }
+
+
+.box-container {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 12px;
+  background-color: #f9f9f9;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%; /* لضمان تمدد البوكس بالكامل داخل السيكشن */
+}
+
+.select-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.section-label {
+  font-weight: bold;
+  font-size: 14px;
+  min-width: 25px; /* للتأكد من ثبات حجم "من" و "إلى" */
+  text-align: right; /* للنص العربي */
+}
+
+.select-row label {
+  white-space: nowrap;
+}
+
+.full-span {
+  grid-column: 1 / -1; /* يجعل البوكس يأخذ كامل عرض الأعمدة داخل الجريد */
+}
+
+.form-grid-vertical {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* عمودين */
+  gap: 12px;
+}
+
+@media (max-width: 600px) {
+  .form-grid-vertical {
+    grid-template-columns: 1fr; /* عمود واحد في الموبايل */
+  }
+}
+
