@@ -5,8 +5,9 @@
   flex-direction: row-reverse;
   align-items: center;
   justify-content: space-between;
-  font-family: sans-serif;
+  font-family: 'Tahoma', sans-serif;
   border-bottom: 1px solid #ddd;
+  position: relative;
 }
 
 .navbar-brand {
@@ -16,35 +17,46 @@
 
 .navbar-links {
   display: flex;
-  gap: 20px;
+  gap: 12px;
 }
 
 .dropdown {
   position: relative;
-  cursor: pointer;
 }
 
 .dropdown-title {
-  padding: 5px 10px;
+  padding: 8px 14px;
   background-color: #e9ecef;
-  border-radius: 4px;
-  transition: background-color 0.2s;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+  user-select: none;
 }
 
-.dropdown-title:hover {
-  background-color: #d8dce0;
+.dropdown-title:hover,
+.dropdown.open .dropdown-title {
+  background-color: #007bff;
+  color: white;
 }
 
 .dropdown-content {
   display: none;
   position: absolute;
-  top: 35px;
+  top: 100%;
   right: 0;
   background-color: white;
   border: 1px solid #ddd;
+  border-radius: 6px;
   min-width: 180px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-  z-index: 100;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  z-index: 1000;
+  overflow: hidden;
+  animation: dropdownFade 0.2s ease-in-out;
+}
+
+@keyframes dropdownFade {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .dropdown.open .dropdown-content {
@@ -52,7 +64,7 @@
 }
 
 .dropdown-item {
-  padding: 8px 12px;
+  padding: 10px 14px;
   text-align: right;
   cursor: pointer;
   white-space: nowrap;
@@ -60,9 +72,10 @@
   text-decoration: none;
   color: #333;
   font-size: 14px;
+  transition: background-color 0.2s, padding-right 0.2s;
 }
 
 .dropdown-item:hover {
-  background-color: #f1f1f1;
-  color: #000; 
+  background-color: #f0f0f0;
+  padding-right: 20px;
 }
