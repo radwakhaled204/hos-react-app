@@ -1,6 +1,6 @@
 import './assets/styles/app.css';
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import Invoice from "./assets/components/Invoice";
+import Invoice from "./components/Invoice";
 import './App.css';
 
 function App() {
@@ -8,6 +8,7 @@ function App() {
   return (
     <Router>
       <Routes>
+        <Route path="/" element={<Invoice />} />
         <Route path="/" element={<Invoice />} />
       </Routes>
     </Router>
