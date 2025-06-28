@@ -263,7 +263,7 @@ select {
   border: 1px solid #ccc;
 }
 .table-scroll-wrapper-down {
-  max-height: 287px;    
+  max-height: 250px;    
   overflow-x: auto;       
   border: 1px solid #ccc;
 }
@@ -353,8 +353,8 @@ select {
 .double-form-grid {
   display: grid;
   grid-template-columns: 100px 1fr;
-  gap: 7px 12px;
-  width: 100%;
+  gap: 6px 6px;
+  width: 80%;
   font-size: 16px;
 }
 
@@ -367,7 +367,7 @@ select {
 .double-input {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   width: 80%;
   flex-wrap: wrap;
 }
@@ -398,7 +398,7 @@ select {
   color: white;
   cursor: pointer;
   min-width: 100px;
-  margin-top: 30px;
+
   margin-right: auto;
   display: block;
 }
