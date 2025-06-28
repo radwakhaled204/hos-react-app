@@ -1,9 +1,10 @@
 .four-sections-container {
   display: flex;
-  direction: rtl;
   gap: 10px; 
   padding: 10px;
-  flex-wrap: nowrap; 
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-items: flex-start;
 }
 
 .section {
@@ -21,21 +22,40 @@
   font-weight: bold;
   font-size: 17px;
   display: flex;
-  justify-content: flex-start;
-  align-items: flex-start; 
-    border: 1px solid #aaa;
-  border-radius: 6px; 
-    box-sizing: border-box;
+  flex-direction: column;
+  align-items: flex-start;
+  flex: 0 0 auto;
+  box-sizing: border-box;
+  border: 1px solid #aaa;
+  border-radius: 6px;
 }
 
+.form-grid {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 7px 6px;
+  width: 100%;
+  font-size: 16px;
+}
 
-.form-grid ,
-.form-grid-2{
+@media (max-width: 768px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.form-grid-2 {
   display: grid;
   grid-template-columns: 100px 1fr; 
   gap: 7px 1px; 
   width: 100%;
   font-size: 16px;
+}
+
+@media (max-width: 768px) {
+  .form-grid-2 {
+    grid-template-columns: 1fr;
+  }
 }
 
 .form-grid label {
@@ -44,7 +64,7 @@
   align-self: center;
 }
 
-.form-grid  input {
+.form-grid input {
   padding: 6px 10px;
   border: 1px solid #aaa;
   border-radius: 6px;
@@ -52,14 +72,14 @@
   box-sizing: border-box;
 }
 
-.form-grid-2  input {
+.form-grid-2 input {
   padding: 6px 10px;
   border: 1px solid #aaa;
   border-radius: 6px;
   width: 130px;
   box-sizing: border-box;
 }
-.form-grid-2 select,
+
 .form-grid-2 select {
   padding: 6px 10px;
   border: 1px solid #aaa;
@@ -68,6 +88,7 @@
   box-sizing: border-box;
   font-size: 15px;
 }
+
 .form-grid-vertical {
   display: grid;
   grid-template-columns: 1fr 1.5fr; 
@@ -77,12 +98,19 @@
   align-items: center;
 }
 
+@media (max-width: 768px) {
+  .form-grid-vertical {
+    grid-template-columns: 1fr; /* single column on mobile */
+  }
+}
 
 .date-container {
   grid-column: span 2;
   display: flex;
   flex-direction: row;
   gap: 10px;
+  width: 100%;
+  flex-wrap: wrap;
 }
 
 .date-container input[type="date"] {
@@ -90,16 +118,14 @@
   border: 1px solid #aaa;
   border-radius: 6px;
   font-size: 15px;
-  width: 100%;
+  flex: 1 1 150px; /* responsive sizing */
   box-sizing: border-box;
 }
-
 
 .store-labels label {
   font-weight: bold;
   text-align: right;
 }
-
 
 select {
   padding: 6px 10px;
@@ -110,21 +136,21 @@ select {
   box-sizing: border-box;
 }
 
-
 .radio-group {
   display: flex;
   gap: 12px;
   flex-wrap: wrap;
-  grid-column: span 2; 
+  grid-column: span 2;
 }
+
 .radio-group input {
-  padding: 6px 6px;
+  padding: 6px;
   border: 1px solid #aaa;
   border-radius: 6px;
   font-size: 13px;
   box-sizing: border-box;
-   display: flex;
 }
+
 .radio-option {
   display: flex;
   align-items: center;
@@ -132,25 +158,48 @@ select {
   font-size: 14px;
 }
 
-
 .date-grid-container {
   display: flex;
   flex-direction: column;
-  width: 500px;
+  width: 100%;
   gap: 20px;
 }
-
 
 .form-grid-4 {
   display: flex;
   align-items: center;
-  gap: 12px; 
-  flex-wrap: nowrap;
+  gap: 12px;
+  flex-wrap: wrap; /* wrap on mobile */
   font-size: 16px;
 }
+/* Make the table section wider on larger screens */
+.section.table-section {
+  flex: 1 1 auto; /* grow to take remaining space */
+  min-width: 500px; /* ensures minimum readable width */
+}
 
+@media (max-width: 992px) {
+  .section.table-section {
+    flex: 1 1 100%; /* full width on tablets */
+  }
+}
 
+@media (max-width: 576px) {
+  .section.table-section {
+    flex: 1 1 100%; /* full width on mobiles */
+  }
+}
 
+@media (max-width: 1350px) {
+  .four-sections-container {
+    flex-wrap: wrap;
+  }
+  .section,
+  .section-2,
+  .section.table-section {
+    flex: 1 1 100%;
+  }
+}
 
 
 
@@ -211,7 +260,11 @@ select {
 .table-scroll-wrapper {
   max-height: 190px;    
   overflow-x: auto;       
-  overflow-y: hidden;      
+  border: 1px solid #ccc;
+}
+.table-scroll-wrapper-down {
+  max-height: 287px;    
+  overflow-x: auto;       
   border: 1px solid #ccc;
 }
 
@@ -237,16 +290,6 @@ select {
   z-index: 2; 
      
   border-bottom: 2px solid #ccc;
-}
-.sticky-col {
-  position: sticky;
-  right: 0; 
-  background: white;
-  z-index: 2;
-}
-
-.data-grid thead th.sticky-col {
-  z-index: 2; 
 }
 
 .section-divider {
@@ -306,15 +349,6 @@ select {
 
 
 
-
-.section-2 {
-  position: relative;
-  padding: 5px;
-  background: #f9f9f9;
-  border-radius: 8px;
-  max-width: 600px;
-  margin: 0 auto;
-}
 
 .double-form-grid {
   display: grid;
