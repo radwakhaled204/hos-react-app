@@ -95,8 +95,9 @@ const Invoice = () => {
 <div className="section">
   <div className="form-grid-vertical">
 
-    
+    {/* Radio Buttons */}
     <div className="radio-group">
+      <input type="text" name="dafterNumber" placeholder="المبيعات"/>
       <label className="radio-option">
         <input type="radio" name="status" value="registered" />
         مسجل
@@ -111,30 +112,38 @@ const Invoice = () => {
       </label>
     </div>
 
-  
+    {/* Date Range */}
     <div className="date-container">
       <input type="date" name="permissionDate1" />
       <input type="date" name="permissionDate2" />
     </div>
 
+ <div className="box-container full-span">
+    <div className="select-row">
+      <label className="section-label">من</label>
+      <label>المخزن الرئيسي</label>
+      <select name="mainStore">
+        <option>المخزن الرئيسي</option>
+      </select>
+    </div>
+    <div className="select-row">
+      <label className="section-label">إلى</label>
+      <label>المخزن الفرعي</label>
+      <select name="subStore">
+        <option>المخزن الفرعي</option>
+      </select>
+    </div>
+  </div>
 
 
-     <label>المخزن الرئيسي</label>
-          <select name="mainStore">
-      <option>المخزن الرئيسى</option>
-      <option value="1">1</option>
-    </select>  
-     <label>المخزن الفرعي</label>
-    <select name="subStore">
-      <option>المخزن الفرعى</option>
-      <option value="1">1</option>
-    </select>
-  
+
 
 
 
   </div>
 </div>
+
+
 <div className="section">
   <div className="date-grid-container">
     <div className="table-scroll-wrapper">
