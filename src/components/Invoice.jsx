@@ -40,6 +40,29 @@ const Invoice = () => {
     setRows(updatedRows);
   };
 
+  const tableData = [
+  { name: "باراسيتامول", quantity: 50, unit: "علبة", priceAfterDiscount: "12.50" },
+  { name: "إيبوبروفين", quantity: 30, unit: "علبة", priceAfterDiscount: "18.00" },
+  { name: "أموكسيسيلين", quantity: 20, unit: "علبة", priceAfterDiscount: "25.00" },
+  { name: "فيتامين سي", quantity: 40, unit: "علبة", priceAfterDiscount: "10.00" },
+  { name: "كالسيوم", quantity: 60, unit: "علبة", priceAfterDiscount: "22.50" },
+  { name: "حديد", quantity: 15, unit: "علبة", priceAfterDiscount: "16.75" },
+];
+
+const financeTableData = [
+  { debitAmount: "1500.00", debitAccount: "حساب المشتريات", creditAmount: "1500.00", creditAccount: "الصندوق" },
+  { debitAmount: "2200.00", debitAccount: "المخزون", creditAmount: "2200.00", creditAccount: "البنك" },
+  { debitAmount: "500.00", debitAccount: "حساب الأدوية", creditAmount: "500.00", creditAccount: "الموردين" },
+  { debitAmount: "1000.00", debitAccount: "المصروفات العمومية", creditAmount: "1000.00", creditAccount: "الصندوق" },
+  { debitAmount: "1000.00", debitAccount: "المصروفات العمومية", creditAmount: "1000.00", creditAccount: "الصندوق" },
+  { debitAmount: "1000.00", debitAccount: "المصروفات العمومية", creditAmount: "1000.00", creditAccount: "الصندوق" },
+  { debitAmount: "1000.00", debitAccount: "المصروفات العمومية", creditAmount: "1000.00", creditAccount: "الصندوق" },
+  { debitAmount: "1000.00", debitAccount: "المصروفات العمومية", creditAmount: "1000.00", creditAccount: "الصندوق" },
+  { debitAmount: "1000.00", debitAccount: "المصروفات العمومية", creditAmount: "1000.00", creditAccount: "الصندوق" },
+];
+
+
+
 
 
   return (
@@ -144,111 +167,27 @@ const Invoice = () => {
 </div>
 
 
-<div className="section">
+<div className="section table-section">
   <div className="date-grid-container">
     <div className="table-scroll-wrapper">
       <table className="data-grid">
         <thead>
           <tr>          
-            <th className="sticky-col">الاسم</th>
+            <th>الاسم</th>
             <th>الكمية</th>
             <th>الوحدة</th>
             <th>السعر بعد الخصم</th>
-            <th>الاسم</th>            
-            <th>الكمية</th>
-            <th>الوحدة</th>
-            <th>السعر بعد الخصم</th>
-            <th>الاسم</th>            
-            <th>الكمية</th>
-            <th>الوحدة</th>
-            <th>السعر بعد الخصم</th>                                         
           </tr>
         </thead>
         <tbody>
-          <tr>
-<td className="sticky-col">باراسيتامول</td>
-            <td>50</td>
-            <td>علبة</td>  
-            <td>12.50</td>
-            <td>باراسيتامول</td>
-            <td>50</td>
-            <td>علبة</td>  
-            <td>12.50</td>
-            <td>باراسيتامول</td>
-            <td>50</td>
-            <td>علبة</td>  
-            <td>12.50</td>                         
-          </tr>
-          <tr>
-<td className="sticky-col">باراسيتامول</td>
-            <td>50</td>
-            <td>علبة</td>  
-            <td>12.50</td>
-            <td>باراسيتامول</td>
-            <td>50</td>
-            <td>علبة</td>  
-            <td>12.50</td>
-<td className="sticky-col">باراسيتامول</td>
-            <td>50</td>
-            <td>علبة</td>  
-            <td>12.50</td>             
-          </tr>
-          <tr>
-<td className="sticky-col">باراسيتامول</td>
-            <td>50</td>
-            <td>علبة</td>  
-            <td>12.50</td>
-            <td>باراسيتامول</td>
-            <td>50</td>
-            <td>علبة</td>  
-            <td>12.50</td>
-            <td>باراسيتامول</td>
-            <td>50</td>
-            <td>علبة</td>  
-            <td>12.50</td>            
-          </tr>
-          <tr>
-<td className="sticky-col">باراسيتامول</td>
-            <td>50</td>
-            <td>علبة</td>  
-            <td>12.50</td>
-            <td>باراسيتامول</td>
-            <td>50</td>
-            <td>علبة</td>  
-            <td>12.50</td>
-            <td>باراسيتامول</td>
-            <td>50</td>
-            <td>علبة</td>  
-            <td>12.50</td>   
-          </tr>
-          <tr>
-<td className="sticky-col">باراسيتامول</td>
-            <td>50</td>
-            <td>علبة</td>  
-            <td>12.50</td>
-            <td>باراسيتامول</td>
-            <td>50</td>
-            <td>علبة</td>  
-            <td>12.50</td>
-            <td>باراسيتامول</td>
-            <td>50</td>
-            <td>علبة</td>  
-            <td>12.50</td>     
-          </tr>
-          <tr>
-<td className="sticky-col">باراسيتامول</td>
-            <td>50</td>
-            <td>علبة</td>  
-            <td>12.50</td>
-            <td>باراسيتامول</td>
-            <td>50</td>
-            <td>علبة</td>  
-            <td>12.50</td>
-            <td>باراسيتامول</td>
-            <td>50</td>
-            <td>علبة</td>  
-            <td>12.50</td>    
-          </tr>                                    
+          {tableData.map((item, index) => (
+            <tr key={index}>
+              <td>{item.name}</td>
+              <td>{item.quantity}</td>
+              <td>{item.unit}</td>
+              <td>{item.priceAfterDiscount}</td>
+            </tr>
+          ))}
         </tbody>
       </table>
     </div>
@@ -487,75 +426,30 @@ const Invoice = () => {
 
 
 
- <div className="section"> 
+ <div className="section table-section"> 
  <div className="date-grid-container">
-    <div className="table-scroll-wrapper-3">
-<table className="data-grid">
-  <thead>
-    <tr>
-      <th>المبلغ</th>
-      <th>الطرف المدين</th>
-      <th>المبلغ</th>
-      <th>الطرف الدائن</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>1500.00</td>
-      <td>حساب المشتريات</td>
-      <td>1500.00</td>
-      <td>الصندوق</td>
-    </tr>
-    <tr>
-      <td>2200.00</td>
-      <td>المخزون</td>
-      <td>2200.00</td>
-      <td>البنك</td>
-    </tr>
-    <tr>
-      <td>500.00</td>
-      <td>حساب الأدوية</td>
-      <td>500.00</td>
-      <td>الموردين</td>
-    </tr>
-    <tr>
-      <td>1000.00</td>
-      <td>المصروفات العمومية</td>
-      <td>1000.00</td>
-      <td>الصندوق</td>
-    </tr>
-     <tr>
-      <td>1000.00</td>
-      <td>المصروفات العمومية</td>
-      <td>1000.00</td>
-      <td>الصندوق</td>
-    </tr>
-     <tr>
-      <td>1000.00</td>
-      <td>المصروفات العمومية</td>
-      <td>1000.00</td>
-      <td>الصندوق</td>
-    </tr>
-      <tr>
-      <td>1000.00</td>
-      <td>المصروفات العمومية</td>
-      <td>1000.00</td>
-      <td>الصندوق</td>
-    </tr>
-      <tr>
-      <td>1000.00</td>
-      <td>المصروفات العمومية</td>
-      <td>1000.00</td>
-      <td>الصندوق</td>
-    </tr>
-      <tr>
-      <td>1000.00</td>
-      <td>المصروفات العمومية</td>
-      <td>1000.00</td>
-      <td>الصندوق</td>
-    </tr>            
-  </tbody>
-</table>
+    <div className="table-scroll-wrapper-down">
+      <table className="data-grid">
+        <thead>
+          <tr>
+            <th>المبلغ</th>
+            <th>الطرف المدين</th>
+            <th>المبلغ</th>
+            <th>الطرف الدائن</th>
+          </tr>
+        </thead>
+        <tbody>
+          {financeTableData.map((item, index) => (
+            <tr key={index}>
+              <td>{item.debitAmount}</td>
+              <td>{item.debitAccount}</td>
+              <td>{item.creditAmount}</td>
+              <td>{item.creditAccount}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
 
     </div>
     </div>
