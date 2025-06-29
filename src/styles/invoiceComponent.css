@@ -138,13 +138,13 @@ select {
 
 .radio-group {
   display: flex;
-  gap: 12px;
+  gap: 10px;
   flex-wrap: wrap;
   grid-column: span 2;
 }
 
 .radio-group input {
-  padding: 6px;
+  padding: 5px;
   border: 1px solid #aaa;
   border-radius: 6px;
   font-size: 13px;
@@ -258,7 +258,7 @@ select {
   font-size: 14px;
 }
 .table-scroll-wrapper {
-  max-height: 190px;    
+  max-height: 140px;    
   overflow-x: auto;       
   border: 1px solid #ccc;
 }
@@ -423,12 +423,12 @@ select {
 .box-container {
   border: 1px solid #ccc;
   border-radius: 8px;
-  padding: 12px;
+  padding:6px;
   background-color: #f9f9f9;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  width: 100%; /* لضمان تمدد البوكس بالكامل داخل السيكشن */
+  gap: 4px;
+  width: 100%; 
 }
 
 .select-row {
