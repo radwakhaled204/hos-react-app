@@ -84,11 +84,8 @@ const financeTableData = [
           <input type="text" name="client" />
           <label>رقم دفترى</label>
           <input type="text" name="dafterNumber" />
-     <label>المخزن الرئيسي</label>
-          <select name="mainStore">
-      <option>المخزن الرئيسى</option>
-      <option value="1">1</option>
-    </select>          
+          <label>من</label> 
+             <input type="date" name="permissionDate1" />
         </div>
       </div>
 
@@ -108,42 +105,35 @@ const financeTableData = [
             <option>اختر</option>
             <option value="sub1">1</option>
           </select>   
-   <label>المخزن الفرعي</label>
-    <select name="subStore">
-      <option>المخزن الفرعى</option>
-      <option value="1">1</option>
-    </select>              
+           <label>الى</label>    
+      <input type="date" name="permissionDate2" />
         </div>
       </div>   
 <div className="section">
   <div className="form-grid-vertical">
 
     {/* Radio Buttons */}
-    <div className="radio-group">
-      <input type="text" name="dafterNumber" placeholder="المبيعات"/>
-      <label className="radio-option">
-        <input type="radio" name="status" value="registered" />
-        مسجل
-      </label>
-      <label className="radio-option">
-        <input type="radio" name="status" value="canceled" defaultChecked />
-        ملغى
-      </label>
-      <label className="radio-option">
-        <input type="radio" name="status" value="all" />
-        الكل
-      </label>
-    </div>
 
-    {/* Date Range */}
-    <div className="date-container">
-      <input type="date" name="permissionDate1" />
-      <input type="date" name="permissionDate2" />
-    </div>
+
 
  <div className="box-container full-span">
     <div className="select-row">
       <label className="section-label">من</label>
+      <label>المخزن الرئيسي</label>
+      <select name="mainStore">
+        <option>المخزن الرئيسي</option>
+      </select>
+    </div>
+    <div className="select-row">
+    
+      <label>المخزن الفرعي</label>
+      <select name="subStore">
+        <option>المخزن الفرعي</option>
+      </select>
+    </div>
+  </div>
+ <div className="box-container full-span">
+    <div className="select-row">
       <label>المخزن الرئيسي</label>
       <select name="mainStore">
         <option>المخزن الرئيسي</option>
@@ -169,6 +159,21 @@ const financeTableData = [
 
 <div className="section table-section">
   <div className="date-grid-container">
+       <div className="radio-group">
+      <input type="text" name="dafterNumber" placeholder="المبيعات"/>
+      <label className="radio-option">
+        <input type="radio" name="status" value="registered" />
+        مسجل
+      </label>
+      <label className="radio-option">
+        <input type="radio" name="status" value="canceled" defaultChecked />
+        ملغى
+      </label>
+      <label className="radio-option">
+        <input type="radio" name="status" value="all" />
+        الكل
+      </label>
+    </div> 
     <div className="table-scroll-wrapper">
       <table className="data-grid">
         <thead>
@@ -227,92 +232,7 @@ const financeTableData = [
       </tr>
     </thead>
  <tbody>
-          {rows.map((row, index) => (
-            <tr key={index}>
-              <td>
-                <input
-                  type="text"
-                  value={row.unit}
-                  onChange={(e) => handleProductChange(index, "unit", e.target.value)}
-                  className="table-input"
-                />
-              </td>
-              <td>
-                <input
-                  type="number"
-                  value={row.quantity}
-                  onChange={(e) => handleProductChange(index, "quantity", e.target.value)}
-                  className="table-input"
-                />
-              </td>
-              <td>
-                <input
-                  type="number"
-                  value={row.price}
-                  onChange={(e) => handleProductChange(index, "price", e.target.value)}
-                  className="table-input"
-                />
-              </td>
-              <td>
-                <input
-                  type="number"
-                  value={row.discountPercent}
-                  onChange={(e) => handleProductChange(index, "discountPercent", e.target.value)}
-                  className="table-input"
-                />
-              </td>
-              <td>
-                <input
-                  type="number"
-                  value={row.discountValue}
-                  className="table-input"
-                  readOnly
-                />
-              </td>
-              <td>
-                <input
-                  type="number"
-                  value={row.priceBeforeDiscount}
-                  className="table-input"
-                  readOnly
-                />
-              </td>
-              <td>
-                <input
-                  type="number"
-                  value={row.valueBeforeDiscount}
-                  className="table-input"
-                  readOnly
-                />
-              </td>
-              <td>
-                <input
-                  type="number"
-                  value={row.value}
-                  className="table-input"
-                  readOnly
-                />
-              </td>
-              <td>
-                <input
-                  type="number"
-                  value={row.afterDiscount}
-                  className="table-input"
-                  readOnly
-                />
-              </td>
-              <td>
-                <input
-                  type="number"
-                  value={row.finalDiscount}
-                  onChange={(e) => handleProductChange(index, "finalDiscount", e.target.value)}
-                  className="table-input"
-                />
-              </td>
-            </tr>
-            
-          ))}
-      <tr>
+       <tr>
         <td>كرتونة</td>
         <td>5</td>
         <td>100</td>
