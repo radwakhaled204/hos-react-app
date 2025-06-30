@@ -117,8 +117,8 @@ const financeTableData = [
 
 
  <div className="box-container full-span">
+      <label className="" style={{textAlign:'center'}}>من</label>
     <div className="select-row">
-      <label className="section-label">من</label>
       <label>المخزن الرئيسي</label>
       <select name="mainStore">
         <option>المخزن الرئيسي</option>
@@ -133,6 +133,7 @@ const financeTableData = [
     </div>
   </div>
  <div className="box-container full-span">
+      <label className="" style={{textAlign: 'center'}}>إلى</label>
     <div className="select-row">
       <label>المخزن الرئيسي</label>
       <select name="mainStore">
@@ -140,7 +141,6 @@ const financeTableData = [
       </select>
     </div>
     <div className="select-row">
-      <label className="section-label">إلى</label>
       <label>المخزن الفرعي</label>
       <select name="subStore">
         <option>المخزن الفرعي</option>
