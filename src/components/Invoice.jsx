@@ -14,7 +14,7 @@ const Invoice = () => {
     { debitAmount: "500.00", debitAccount: "حساب الأدوية", creditAmount: "500.00", creditAccount: "الموردين" },
     { debitAmount: "1000.00", debitAccount: "المصروفات العمومية", creditAmount: "1000.00", creditAccount: "الصندوق" },
   ];
-
+const [contextMenu, setContextMenu] = useState(null); 
   const [itemCode, setItemCode] = useState("");
   const [itemName, setItemName] = useState("");
   const [tableData, setTableData] = useState([]);
@@ -84,7 +84,10 @@ const handleNameChange = async (e) => {
   }
 };
 
-// الدالة المستقلة لجلب بيانات الصنف عند معرفة الكود مباشرة
+const totalAfterDiscount = tableData.reduce(
+  (acc, item) => acc + (Number(item.tot_af) || 0),
+  0
+);
 const fetchItemData = async (code) => {
   if (!code || code.trim() === "") {
     alert("يرجى إدخال كود الصنف أولاً");
@@ -243,6 +246,7 @@ const handleAddItems = async () => {
 
 
 
+
   return (
     <div className="header">
      <div className="four-sections-container"> 
@@ -348,7 +352,6 @@ const handleAddItems = async () => {
   <table className="data-grid">
     <thead>
       <tr>
-        
         <th style={{ width: "150px" }}>الصنف</th>
         <th style={{ width: "100px" }}>الوحدة</th>    
         <th style={{ width: "100px" }}>الكمية</th>
@@ -367,7 +370,18 @@ const handleAddItems = async () => {
     </thead>
     <tbody>
       {tableData.map((item, index) => (
-        <tr key={index}>
+        <tr 
+  key={index}
+  onContextMenu={(e) => {
+    e.preventDefault();
+    setContextMenu({
+      mouseX: e.clientX,
+      mouseY: e.clientY,
+      rowIndex: index,
+    });
+  }}>
+
+
           <td>{item.name || "-"}</td>
           <td>{item.am_n || "-"}</td>
           <td>{item.qun || 0}</td>
@@ -386,6 +400,28 @@ const handleAddItems = async () => {
       ))}
     </tbody>
   </table>
+ {contextMenu && (
+  <div
+    style={{
+      position: "fixed",
+      top: contextMenu.mouseY,
+      left: contextMenu.mouseX,
+      backgroundColor: "white",
+      border: "1px solid #ccc",
+      padding: "8px",
+      zIndex: 9999,
+      cursor: "pointer"
+    }}
+    onClick={() => {
+    
+      alert(` تم الضغط على حذف للصف رقم ${contextMenu.rowIndex + 1}`);
+      setContextMenu(null);
+    }}
+    onMouseLeave={() => setContextMenu(null)}
+  >
+    حذف الصف
+  </div>
+)} 
 </div>
 
 
@@ -553,7 +589,7 @@ const handleAddItems = async () => {
   <div className="double-form-grid">
     <label>الإجمالي</label>
     <div className="double-input">
-      <input type="text" name="total1" />
+      <input type="text" name="total1" value={totalAfterDiscount} />
       <input type="text" name="total2" />
     </div>
 
