@@ -1,6 +1,6 @@
 
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "../styles/invoiceComponent.css"; 
 import axios from "axios";
 
@@ -14,7 +14,18 @@ const Invoice = () => {
     { debitAmount: "500.00", debitAccount: "حساب الأدوية", creditAmount: "500.00", creditAccount: "الموردين" },
     { debitAmount: "1000.00", debitAccount: "المصروفات العمومية", creditAmount: "1000.00", creditAccount: "الصندوق" },
   ];
-const [contextMenu, setContextMenu] = useState(null); 
+  const [contextMenu, setContextMenu] = useState(null); 
+// 🟩 لمخزن "من"
+const [fromMainStores, setFromMainStores] = useState([]);
+const [fromSelectedMainStore, setFromSelectedMainStore] = useState("");
+const [fromSubStores, setFromSubStores] = useState([]);
+
+// 🟩 لمخزن "إلى"
+const [toMainStores, setToMainStores] = useState([]);
+const [toSelectedMainStore, setToSelectedMainStore] = useState("");
+const [toSubStores, setToSubStores] = useState([]);
+
+ 
   const [itemCode, setItemCode] = useState("");
   const [itemName, setItemName] = useState("");
   const [tableData, setTableData] = useState([]);
@@ -39,7 +50,51 @@ const [contextMenu, setContextMenu] = useState(null);
 
 
 
+useEffect(() => {
+  const fetchFromStores = async () => {
+    try {
+      if (fromMainStores.length === 0) {
+        const response = await axios.get("https://www.istpos.somee.com/api/Stoc/stoc1");
+        setFromMainStores(response.data);
+      }
+      if (fromSelectedMainStore) {
+        const response = await axios.get(
+          `https://www.istpos.somee.com/api/Stoc/stoc2?name1=${encodeURIComponent(fromSelectedMainStore)}`
+        );
+        setFromSubStores(response.data);
+      } else {
+        setFromSubStores([]);
+      }
+    } catch (error) {
+      console.error("❌ خطأ في تحميل بيانات المخازن (من):", error);
+    }
+  };
 
+  fetchFromStores();
+}, [fromSelectedMainStore]);
+
+useEffect(() => {
+  const fetchToStores = async () => {
+    try {
+      if (toMainStores.length === 0) {
+        const response = await axios.get("https://www.istpos.somee.com/api/Stoc/stoc1");
+        setToMainStores(response.data);
+      }
+      if (toSelectedMainStore) {
+        const response = await axios.get(
+          `https://www.istpos.somee.com/api/Stoc/stoc2?name1=${encodeURIComponent(toSelectedMainStore)}`
+        );
+        setToSubStores(response.data);
+      } else {
+        setToSubStores([]);
+      }
+    } catch (error) {
+      console.error("❌ خطأ في تحميل بيانات المخازن (إلى):", error);
+    }
+  };
+
+  fetchToStores();
+}, [toSelectedMainStore]);
 
 useState(() => {
   const fetchInitialData = async () => {
@@ -297,37 +352,58 @@ const handleAddItems = async () => {
 
 
 
- <div className="box-container full-span">
-      <label className="" style={{textAlign:'center'}}>من</label>
-    <div className="select-row">
-      <label>المخزن الرئيسي</label>
-      <select name="mainStore">
-        <option>المخزن الرئيسي</option>
-      </select>
-    </div>
-    <div className="select-row">
-    
-      <label>المخزن الفرعي</label>
-      <select name="subStore">
-        <option>المخزن الفرعي</option>
-      </select>
-    </div>
+<div className="box-container full-span">
+  <label style={{ textAlign: 'center' }}>من</label>
+  <div className="select-row">
+    <label>المخزن الرئيسي</label>
+    <select
+      name="mainStoreFrom"
+      value={fromSelectedMainStore}
+      onChange={(e) => setFromSelectedMainStore(e.target.value)}
+    >
+      <option value="">اختر</option>
+      {fromMainStores.map((store, idx) => (
+        <option key={idx} value={store.name}>{store.name}</option>
+      ))}
+    </select>
   </div>
- <div className="box-container full-span">
-      <label className="" style={{textAlign: 'center'}}>إلى</label>
-    <div className="select-row">
-      <label>المخزن الرئيسي</label>
-      <select name="mainStore">
-        <option>المخزن الرئيسي</option>
-      </select>
-    </div>
-    <div className="select-row">
-      <label>المخزن الفرعي</label>
-      <select name="subStore">
-        <option>المخزن الفرعي</option>
-      </select>
-    </div>
+  <div className="select-row">
+    <label>المخزن الفرعي</label>
+    <select name="subStoreFrom">
+      <option value="">اختر</option>
+      {fromSubStores.map((store, idx) => (
+        <option key={idx} value={store.name}>{store.name}</option>
+      ))}
+    </select>
   </div>
+</div>
+
+<div className="box-container full-span">
+  <label style={{ textAlign: 'center' }}>إلى</label>
+  <div className="select-row">
+    <label>المخزن الرئيسي</label>
+    <select
+      name="mainStoreTo"
+      value={toSelectedMainStore}
+      onChange={(e) => setToSelectedMainStore(e.target.value)}
+    >
+      <option value="">اختر</option>
+      {toMainStores.map((store, idx) => (
+        <option key={idx} value={store.name}>{store.name}</option>
+      ))}
+    </select>
+  </div>
+  <div className="select-row">
+    <label>المخزن الفرعي</label>
+    <select name="subStoreTo">
+      <option value="">اختر</option>
+      {toSubStores.map((store, idx) => (
+        <option key={idx} value={store.name}>{store.name}</option>
+      ))}
+    </select>
+  </div>
+</div>
+
 
   </div>
 </div>
