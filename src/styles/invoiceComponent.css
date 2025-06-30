@@ -33,7 +33,7 @@
 .form-grid {
   display: grid;
   grid-template-columns: 120px 1fr;
-  gap: 7px 6px;
+  gap: 19px 1px;
   width: 100%;
   font-size: 16px;
 }
@@ -47,7 +47,7 @@
 .form-grid-2 {
   display: grid;
   grid-template-columns: 100px 1fr; 
-  gap: 7px 1px; 
+  gap: 17px 1px; 
   width: 100%;
   font-size: 16px;
 }
