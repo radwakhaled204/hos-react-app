@@ -17,6 +17,7 @@ const Invoice = () => {
 
   const [itemCode, setItemCode] = useState("");
   const [itemName, setItemName] = useState("");
+  const [tableData, setTableData] = useState([]);
   const [nameSuggestions, setNameSuggestions] = useState([]);
   const [rows, setRows] = useState([
     {
@@ -32,8 +33,31 @@ const Invoice = () => {
       finalDiscount: 0,
       bonus: 0,
       Itemname: "",
+      checked: true,
     },
   ]);
+
+
+
+
+
+useState(() => {
+  const fetchInitialData = async () => {
+    
+      const response = await axios.get(
+        "https://www.istpos.somee.com/api/Stoc/stoc_items_trans"
+      );
+
+      setTableData(response.data);
+
+  };
+
+  fetchInitialData(); 
+}, []);
+
+
+
+
 
   const handleCodeChange = (e) => {
     setItemCode(e.target.value);
@@ -84,6 +108,7 @@ const fetchItemData = async (code) => {
       afterDiscount: 0,
       finalDiscount: 0,
       bonus: item.bons || 0,
+      checked: true, 
     }));
 
     setRows(fetchedData);
@@ -125,10 +150,15 @@ const handleSelectSuggestion = async (selectedItem) => {
     setRows(updatedRows);
   };
 
-  
 const handleAddItems = async () => {
   try {
     for (const row of rows) {
+    
+      if (!row.checked) {
+        console.log(`🚫 الصف ${row.Itemname || row.code} غير محدد - لن تتم إضافته`);
+        continue;
+      }
+
       const payload = {
         stoc_lev1: "string",
         stoc_lev2: "string",
@@ -140,7 +170,6 @@ const handleAddItems = async () => {
         req_noo: "string",
         pers1: "string",
         pers2: "string",
-        // ✅ لن نرسل التواريخ إطلاقًا
         cust_n: "string",
         code: row.code ? parseInt(row.code) : 0,
         name: row.Itemname || "string",
@@ -188,17 +217,24 @@ const handleAddItems = async () => {
 
       console.log("🚩 Sending payload:", payload);
 
-      const response = await axios.post(
+      await axios.post(
         "https://www.istpos.somee.com/api/Stoc/insert_stoc_items_trans",
         payload
       );
 
-      console.log("✅ تم إضافة الصنف بنجاح:", response.data);
+      console.log("✅ تم إضافة الصنف بنجاح");
     }
 
-   
+    const response = await axios.get(
+      "https://www.istpos.somee.com/api/Stoc/stoc_items_trans"
+    );
+
+    console.log("✅ تم جلب بيانات الأصناف:", response.data);
+    setTableData(response.data);
+
+    alert("✅ تم ترحيل الأصناف وجلب البيانات بنجاح");
   } catch (error) {
-    console.error("❌ خطأ أثناء إضافة البيانات:", error.response?.data || error);
+    console.error("❌ خطأ أثناء إضافة البيانات أو الجلب:", error.response?.data || error);
     alert(JSON.stringify(error.response?.data?.errors || error.response?.data || error));
   }
 };
@@ -308,40 +344,50 @@ const handleAddItems = async () => {
         الكل
       </label>
     </div> 
-    <div className="table-scroll-wrapper">
-      <table className="data-grid">
-        <thead>
-          <tr>
-            <th style={{ width: "150px" }}>الصنف</th>
-            <th style={{ width: "100px" }}>الوحدة</th>
-            <th style={{ width: "100px" }}>الكمية</th>
-            <th style={{ width: "100px" }}>بونص</th>
-            <th style={{ width: "100px" }}>القيمة بعد الخصم</th>
-            <th>الكود</th>
-            <th>السعر</th>
-            <th>نسبة الخصم</th>
-            <th>السعر بعد الخصم</th>
-            <th>القيمة بعد الخصم</th>
-          </tr>
-        </thead>
-        <tbody>
-          {tableData.map((item, index) => (
-            <tr key={index}>
-              <td>{item.name}</td>
-              <td>{item.am_n}</td>
-              <td>{item.qun}</td>
-              <td>{item.bons}</td>
-              <td>{item.tot_af}</td>
-              <td>{item.code}</td>
-              <td>{item.price}</td>
-              <td>{item.dis1}</td>
-              <td>{item.price_af}</td>
-              <td>{item.tot_af}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+<div className="table-scroll-wrapper">
+  <table className="data-grid">
+    <thead>
+      <tr>
+        
+        <th style={{ width: "150px" }}>الصنف</th>
+        <th style={{ width: "100px" }}>الوحدة</th>    
+        <th style={{ width: "100px" }}>الكمية</th>
+        <th style={{ width: "100px" }}>بونص</th>           
+        <th style={{ width: "100px" }}>القيمة بعد الخصم</th>
+        <th>الكود</th> 
+        <th>السعر</th>
+        <th>نسبة الخصم</th>
+        <th>قيمة الخصم</th>
+        <th>سعر قبل الخصم</th>
+        <th>قيمة قبل الخصم</th>
+        <th>القيمة</th>
+        <th>بعد الخصم</th>
+        <th>خصم نهائي</th>
+      </tr>
+    </thead>
+    <tbody>
+      {tableData.map((item, index) => (
+        <tr key={index}>
+          <td>{item.name || "-"}</td>
+          <td>{item.am_n || "-"}</td>
+          <td>{item.qun || 0}</td>
+          <td>{item.bons || 0}</td>
+          <td>{item.tot_af || 0}</td>
+          <td>{item.code || "-"}</td>
+          <td>{item.price || 0}</td>
+          <td>{item.dis1 || 0}%</td>
+          <td>{((item.price * (item.dis1 || 0)) / 100).toFixed(2)}</td>
+          <td>{item.price || 0}</td>
+          <td>{(item.price * item.qun).toFixed(2)}</td>
+          <td>{item.tot || 0}</td>
+          <td>{item.price_af || 0}</td>
+          <td>{item.finalDiscount || 0}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
 
   </div>
 </div>
@@ -414,6 +460,7 @@ const handleAddItems = async () => {
         <table className="data-grid-2">
           <thead>
             <tr>
+              <th>اختيار</th>  
               <th>الصنف</th>
               <th>الوحدة</th> 
               <th>الكمية</th>
@@ -431,7 +478,19 @@ const handleAddItems = async () => {
           <tbody>
             {rows.map((row, index) => (
               <tr key={index}>
-                 <td>{row.Itemname}</td>
+<td>
+  <input
+    type="checkbox"
+    checked={row.checked} // مربوط بالحالة
+    onChange={(e) => {
+      const updatedRows = [...rows];
+      updatedRows[index].checked = e.target.checked;
+      setRows(updatedRows);
+    }}
+  />
+</td>
+
+                 <td>{row.Itemname|| "الاسم"}</td>
                 <td>{row.unit || "كرتونة"}</td>
                 <td>
                   <input
