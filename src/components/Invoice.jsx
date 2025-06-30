@@ -113,7 +113,9 @@ const fetchItemData = async (code) => {
 
     setRows(fetchedData);
 
-    if (response.data.length > 0) {
+    if (response.data.length === 0) {
+      setItemName('')
+    }else if( response.data.length > 0) {
       setItemName(response.data[0].name || "");
     }
   } catch (error) {
@@ -322,42 +324,6 @@ const handleAddItems = async () => {
       </select>
     </div>
   </div>
-<div className="box-container full-span">
-  <div className="section-label-center">من</div>
-  <div className="select-row">
-    <label>المخزن الرئيسي</label>
-    <select name="mainStore">
-      <option>المخزن الرئيسي</option>
-    </select>
-  </div>
-  <div className="select-row">
-    <label> المخزن الفرعى </label>
-    <select name="subStore">
-      <option>المخزن الفرعى</option>
-    </select>
-  </div>
-</div>
-
-<div className="box-container full-span">
-  <div className="section-label-center">إلى</div>
-  <div className="select-row">
-    <label>المخزن الرئيسي</label>
-    <select name="mainStore">
-      <option>المخزن الرئيسي</option>
-    </select>
-  </div>
-  <div className="select-row">
-    <label>  المخزن الفرعى   </label>
-    <select name="subStore">
-      <option>المخزن الفرعى</option>
-    </select>
-  </div>
-</div>
-
-
-
-
-
 
   </div>
 </div>
