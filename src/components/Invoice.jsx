@@ -478,7 +478,7 @@ const handleAddItems = async () => {
       ))}
     </tbody>
   </table>
- {contextMenu && (
+{contextMenu && (
   <div
     style={{
       position: "fixed",
@@ -490,16 +490,29 @@ const handleAddItems = async () => {
       zIndex: 9999,
       cursor: "pointer"
     }}
-    onClick={() => {
-    
-      alert(` تم الضغط على حذف للصف رقم ${contextMenu.rowIndex + 1}`);
-      setContextMenu(null);
-    }}
     onMouseLeave={() => setContextMenu(null)}
   >
-    حذف الصف
+    <div
+      onClick={() => {
+        alert(`تم الضغط على حذف للصف رقم ${contextMenu.rowIndex + 1}`);
+        setContextMenu(null);
+      }}
+      style={{ padding: "4px 0", borderBottom: "1px solid #eee" }}
+    >
+      حذف الصف
+    </div>
+    <div
+      onClick={() => {
+        alert(`تم الضغط على طباعة معينة للصف رقم ${contextMenu.rowIndex + 1}`);
+        setContextMenu(null);
+      }}
+      style={{ padding: "4px 0" }}
+    >
+      معينة
+    </div>
   </div>
-)} 
+)}
+ 
 </div>
 
 
