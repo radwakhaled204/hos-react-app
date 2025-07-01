@@ -15,17 +15,18 @@ const Invoice = () => {
     { debitAmount: "1000.00", debitAccount: "المصروفات العمومية", creditAmount: "1000.00", creditAccount: "الصندوق" },
   ];
   const [contextMenu, setContextMenu] = useState(null); 
-// 🟩 لمخزن "من"
+
 const [fromMainStores, setFromMainStores] = useState([]);
 const [fromSelectedMainStore, setFromSelectedMainStore] = useState("");
 const [fromSubStores, setFromSubStores] = useState([]);
 
-// 🟩 لمخزن "إلى"
+
 const [toMainStores, setToMainStores] = useState([]);
 const [toSelectedMainStore, setToSelectedMainStore] = useState("");
 const [toSubStores, setToSubStores] = useState([]);
+const [clientData, setClientData] = useState([]);
+const [SelectedClient, setSelectedClient] = useState("");
 
- 
   const [itemCode, setItemCode] = useState("");
   const [itemName, setItemName] = useState("");
   const [tableData, setTableData] = useState([]);
@@ -110,6 +111,19 @@ useState(() => {
   fetchInitialData(); 
 }, []);
 
+useState(() => {
+  const fetchClientData = async () => {
+    
+      const response = await axios.get(
+        "https://www.istpos.somee.com/api/client/client"
+      );
+
+      setClientData(response.data);
+
+  };
+
+  fetchClientData(); 
+}, [clientData]);
 
 
 
@@ -301,9 +315,6 @@ const handleAddItems = async () => {
 
 
 
-
-
-
   return (
     <div className="header">
      <div className="four-sections-container"> 
@@ -334,8 +345,13 @@ const handleAddItems = async () => {
           <input type="date" name="permissionDate" />                
 
           <label>العميل</label>
-          <input type="text" name="client" />
-
+          <select  name="client"  value={SelectedClient}
+      onChange={(e) => setSelectedClient(e.target.value)}>
+            
+      {clientData.map((store, idx) => (
+        <option key={idx} value={store.name}>{store.name}</option>
+      ))} 
+          </select>   
           <label>المستلم</label>
           <select name="receiver">
             <option>اختر</option>
@@ -347,11 +363,6 @@ const handleAddItems = async () => {
       </div>   
 <div className="section card-section-dropdown">
   <div className="form-grid-vertical">
-
-    {/* Radio Buttons */}
-
-
-
 <div className="box-container full-span">
   <label style={{ textAlign: 'center' }}>من</label>
   <div className="select-row">
@@ -486,33 +497,42 @@ const handleAddItems = async () => {
       left: contextMenu.mouseX,
       backgroundColor: "white",
       border: "1px solid #ccc",
-      padding: "8px",
+      borderRadius: "6px",
+      boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
       zIndex: 9999,
-      cursor: "pointer"
+      minWidth: "140px",
+      overflow: "hidden"
     }}
     onMouseLeave={() => setContextMenu(null)}
   >
-    <div
-      onClick={() => {
-        alert(`تم الضغط على حذف للصف رقم ${contextMenu.rowIndex + 1}`);
-        setContextMenu(null);
-      }}
-      style={{ padding: "4px 0", borderBottom: "1px solid #eee" }}
-    >
-      حذف الصف
-    </div>
-    <div
-      onClick={() => {
-        alert(`تم الضغط على طباعة معينة للصف رقم ${contextMenu.rowIndex + 1}`);
-        setContextMenu(null);
-      }}
-      style={{ padding: "4px 0" }}
-    >
-      معينة
-    </div>
+    {[
+      { label: " حذف الصف", action: () => alert(`تم الضغط على حذف للصف رقم ${contextMenu.rowIndex + 1}`) },
+      { label: " معينة", action: () => console.log("معينة") },
+      { label: " طباعة الباركود", action: () => console.log("طباعة الباركود") },
+      { label: " حذف الكل", action: () => console.log("حذف الكل") },
+    ].map((item, idx) => (
+      <div
+        key={idx}
+        onClick={() => {
+          item.action();
+          setContextMenu(null);
+        }}
+        style={{
+          padding: "8px 12px",
+          cursor: "pointer",
+          fontSize: "14px",
+          borderBottom: idx !== 3 ? "1px solid #eee" : "none",
+          transition: "background 0.2s"
+        }}
+        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#f0f4ff"}
+        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "white"}
+      >
+        {item.label}
+      </div>
+    ))}
   </div>
 )}
- 
+
 </div>
 
 
