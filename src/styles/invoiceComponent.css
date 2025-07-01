@@ -6,16 +6,6 @@
   justify-content: flex-start;
   align-items: flex-start;
 }
-
-.section {
-  background-color: #fff;
-  padding: 5px;
-  font-weight: bold;
-  font-size: 17px;
-  display: flex;
-  justify-content: flex-start;
-  align-items: flex-start;  
-}
 .section-2 {
   background-color: #fff;
   padding: 5px;
@@ -29,6 +19,71 @@
   border: 1px solid #aaa;
   border-radius: 6px;
 }
+.review-container {
+  display: flex;
+  gap: 10px; 
+  padding: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  width:60%;
+}
+.review-section {
+  background-color: #fff;
+  padding: 5px;
+  font-weight: bold;
+  font-size: 17px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 0 0 auto;
+  box-sizing: border-box;
+  border: 1px solid #aaa;
+  border-radius: 6px;
+  width:100%;
+}
+
+.review-form-grid {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  gap: 6px 6px;
+  width: 50%;
+  font-size: 16px;
+}
+
+.review-form-grid label {
+  font-weight: bold;
+  white-space: nowrap;
+  align-self: center;
+}
+
+.review-input {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 80%;
+  flex-wrap: wrap;
+}
+
+.review-input  input {
+  flex: 1;
+  padding: 6px 10px;
+  border: 1px solid #aaa;
+  border-radius: 6px;
+  font-size: 14px;
+  min-width: 60px;
+}
+
+.section {
+  background-color: #fff;
+  padding: 5px;
+  font-weight: bold;
+  font-size: 17px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;  
+}
+
 
 .form-grid {
   display: grid;
@@ -285,9 +340,15 @@ select {
   overflow-x: auto;       
   border: 1px solid #ccc;
 }
-.table-scroll-wrapper-down {
+.review-table-scroll-wrapper {
   max-height: 250px;    
   overflow-x: auto;       
+  border: 1px solid #ccc;
+}
+.table-scroll-wrapper-down {
+  max-height: 250px;    
+  overflow-x: auto; 
+    overflow-y: auto;        
   border: 1px solid #ccc;
 }
 
@@ -308,7 +369,8 @@ select {
 }
 .table-scroll-wrapper-2 thead th ,
 .table-scroll-wrapper thead th ,
-.table-scroll-wrapper-3 thead th 
+.table-scroll-wrapper-3 thead th ,
+.review-table-scroll-wrapper 
  {
   position: sticky;
   top: 0;
