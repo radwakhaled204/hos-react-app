@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import "../styles/invoiceComponent.css"; 
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 
 
@@ -109,7 +110,7 @@ const handleTotalBox = (idx, field, value) => {
     setRows(updatedRows);
   };
 
-
+  const navigate = useNavigate();
   const [contextMenu, setContextMenu] = useState(null); 
   const [fromMainStores, setFromMainStores] = useState([]);
   const [fromSelectedMainStore, setFromSelectedMainStore] = useState("");
@@ -559,7 +560,7 @@ const handleAddItems = async () => {
   >
     {[
       { label: " حذف الصف", action: () => alert(`تم الضغط على حذف للصف رقم ${contextMenu.rowIndex + 1}`) },
-      { label: " معينة", action: () => console.log("معينة") },
+      { label: " معينة", action: () => navigate("/preview") },
       { label: " طباعة الباركود", action: () => console.log("طباعة الباركود") },
       { label: " حذف الكل", action: () => console.log("حذف الكل") },
     ].map((item, idx) => (
@@ -733,7 +734,7 @@ const handleAddItems = async () => {
   
 {rows.map((row, idx) => (
   <div key={idx} className="double-form-grid">
-    {/* الاجمالى */}
+   
     <label>الاجمالى</label>
     <div className="double-input">
       <input
@@ -754,7 +755,7 @@ const handleAddItems = async () => {
       />
     </div>
 
-    {/* الخصم */}
+   
     <label>خصم</label>
     <div className="double-input">
       <input
@@ -782,7 +783,7 @@ const handleAddItems = async () => {
       />
     </div>
 
-    {/* بعد الخصم */}
+   
     <label>بعد الخصم</label>
     <div className="double-input">
       <input
