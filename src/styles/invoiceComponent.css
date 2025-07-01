@@ -172,6 +172,12 @@ select {
   flex-wrap: wrap; /* wrap on mobile */
   font-size: 16px;
 }
+
+.section.card-section-dropdown{
+  width: 25%;
+}
+
+
 /* Make the table section wider on larger screens */
 .section.table-section {
   flex: 1 1 auto; /* grow to take remaining space */

@@ -345,7 +345,7 @@ const handleAddItems = async () => {
       <input type="date" name="permissionDate2" />
         </div>
       </div>   
-<div className="section">
+<div className="section card-section-dropdown">
   <div className="form-grid-vertical">
 
     {/* Radio Buttons */}
