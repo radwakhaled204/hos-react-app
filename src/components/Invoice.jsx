@@ -7,30 +7,19 @@ import axios from "axios";
 
 
 const Invoice = () => {
+  // تعريف tableData مرتبط بـ useState
+  const [tableData, setTableData] = useState([
+    { tot_af: 100 },
+    { tot_af: 150 },
+    { tot_af: 50 },
+  ]);
 
-  const financeTableData = [
-    { debitAmount: "1500.00", debitAccount: "حساب المشتريات", creditAmount: "1500.00", creditAccount: "الصندوق" },
-    { debitAmount: "2200.00", debitAccount: "المخزون", creditAmount: "2200.00", creditAccount: "البنك" },
-    { debitAmount: "500.00", debitAccount: "حساب الأدوية", creditAmount: "500.00", creditAccount: "الموردين" },
-    { debitAmount: "1000.00", debitAccount: "المصروفات العمومية", creditAmount: "1000.00", creditAccount: "الصندوق" },
-  ];
-  const [contextMenu, setContextMenu] = useState(null); 
+  // حساب الإجمالي بعد الخصم تلقائيًا من tableData
+  const totalAfterDiscount = tableData.reduce(
+    (acc, item) => acc + (Number(item.tot_af) || 0),
+    0
+  );
 
-const [fromMainStores, setFromMainStores] = useState([]);
-const [fromSelectedMainStore, setFromSelectedMainStore] = useState("");
-const [fromSubStores, setFromSubStores] = useState([]);
-
-
-const [toMainStores, setToMainStores] = useState([]);
-const [toSelectedMainStore, setToSelectedMainStore] = useState("");
-const [toSubStores, setToSubStores] = useState([]);
-const [clientData, setClientData] = useState([]);
-const [SelectedClient, setSelectedClient] = useState("");
-
-  const [itemCode, setItemCode] = useState("");
-  const [itemName, setItemName] = useState("");
-  const [tableData, setTableData] = useState([]);
-  const [nameSuggestions, setNameSuggestions] = useState([]);
   const [rows, setRows] = useState([
     {
       unit: "",
@@ -46,9 +35,97 @@ const [SelectedClient, setSelectedClient] = useState("");
       bonus: 0,
       Itemname: "",
       checked: true,
+      total1: 0,
+      total2: 0,
+      finalDiscountMain: 0,
+      finalDiscountSmall1: 0,
+      finalDiscountSmall2: 0,
+      finalAfterDiscount: 0,
+      finalTaxMain: 0,
+      finalTaxSmall1: 0,
+      finalInvoiceValue: 0,
+      finalAdditionalTaxMain: 0,
+      finalAdditionalTaxSmall: 0,
     },
   ]);
 
+  // تحديث total1 تلقائيًا من totalAfterDiscount
+  useEffect(() => {
+    setRows((prevRows) =>
+      prevRows.map((row) => ({
+        ...row,
+        total1: totalAfterDiscount,
+      }))
+    );
+  }, [totalAfterDiscount]);
+
+const handleTotalBox = (idx, field, value) => {
+  const updatedRows = [...rows];
+  const row = updatedRows[idx];
+
+  row[field] = parseFloat(value) || 0;
+
+  // حساب الخصم وقيمة بعد الخصم تلقائيا عند تغيير نسبة الخصم أو الإجمالي
+  if (field === "finalDiscountMain" || field === "total1") {
+    row.finalDiscountSmall1 = parseFloat(
+      ((row.total1 * row.finalDiscountMain) / 100).toFixed(2)
+    );
+    row.finalAfterDiscount = parseFloat(
+      (row.total1 - row.finalDiscountSmall1).toFixed(2)
+    );
+  }
+   if (field === "finalTaxMain" || field === "total1") {
+    row.finalTaxSmall1= parseFloat(
+      ((row.total1 * row.finalTaxMain) / 100).toFixed(2)
+    );
+      row.finalInvoiceValue = parseFloat(
+      (row.finalAfterDiscount + row.finalTaxSmall1).toFixed(2)
+    );
+  }
+  
+   if (field === "finalAdditionalTaxMain" || field === "total1") {
+    row.  finalAdditionalTaxSmall= parseFloat(
+      ((row.total1 * row.finalAdditionalTaxMain) / 100).toFixed(2)
+    );
+
+  }
+  setRows(updatedRows);
+};
+
+    const handleProductChange = (index, field, value) => {
+    const updatedRows = [...rows];
+    updatedRows[index] = {
+      ...updatedRows[index],
+      [field]: field === "unit" ? value : parseFloat(value) || 0,
+    };
+
+    const row = updatedRows[index];
+    row.priceBeforeDiscount = row.price;
+    row.discountValue = (row.price * row.discountPercent) / 100;
+    row.afterDiscount = row.price - row.discountValue;
+    row.valueBeforeDiscount = row.price * row.quantity;
+    row.value = row.afterDiscount * row.quantity;
+
+    setRows(updatedRows);
+  };
+
+
+  const [contextMenu, setContextMenu] = useState(null); 
+  const [fromMainStores, setFromMainStores] = useState([]);
+  const [fromSelectedMainStore, setFromSelectedMainStore] = useState("");
+  const [fromSubStores, setFromSubStores] = useState([]);
+
+
+  const [toMainStores, setToMainStores] = useState([]);
+  const [toSelectedMainStore, setToSelectedMainStore] = useState("");
+  const [toSubStores, setToSubStores] = useState([]);
+  const [clientData, setClientData] = useState([]);
+  const [SelectedClient, setSelectedClient] = useState("");
+
+  const [itemCode, setItemCode] = useState("");
+  const [itemName, setItemName] = useState("");
+
+  const [nameSuggestions, setNameSuggestions] = useState([]);
 
 
 useEffect(() => {
@@ -125,12 +202,9 @@ useState(() => {
   fetchClientData(); 
 }, [clientData]);
 
-
-
-
-  const handleCodeChange = (e) => {
+const handleCodeChange = (e) => {
     setItemCode(e.target.value);
-  };
+};
 const handleNameChange = async (e) => {
   const value = e.target.value;
   setItemName(value);
@@ -153,10 +227,7 @@ const handleNameChange = async (e) => {
   }
 };
 
-const totalAfterDiscount = tableData.reduce(
-  (acc, item) => acc + (Number(item.tot_af) || 0),
-  0
-);
+
 const fetchItemData = async (code) => {
   if (!code || code.trim() === "") {
     alert("يرجى إدخال كود الصنف أولاً");
@@ -195,7 +266,6 @@ const fetchItemData = async (code) => {
   }
 };
 
-// عند اختيار عنصر من لوحة الاقتراحات
 const handleSelectSuggestion = async (selectedItem) => {
   setItemName(selectedItem.name);
   setItemCode(selectedItem.code);
@@ -204,25 +274,6 @@ const handleSelectSuggestion = async (selectedItem) => {
   // استدعاء جلب بيانات الصنف مباشرة بعد اختيار الاسم
   await fetchItemData(selectedItem.code);
 };
-
-
-
-  const handleProductChange = (index, field, value) => {
-    const updatedRows = [...rows];
-    updatedRows[index] = {
-      ...updatedRows[index],
-      [field]: field === "unit" ? value : parseFloat(value) || 0,
-    };
-
-    const row = updatedRows[index];
-    row.priceBeforeDiscount = row.price;
-    row.discountValue = (row.price * row.discountPercent) / 100;
-    row.afterDiscount = row.price - row.discountValue;
-    row.valueBeforeDiscount = row.price * row.quantity;
-    row.value = row.afterDiscount * row.quantity;
-
-    setRows(updatedRows);
-  };
 
 const handleAddItems = async () => {
   try {
@@ -312,9 +363,12 @@ const handleAddItems = async () => {
     alert(JSON.stringify(error.response?.data?.errors || error.response?.data || error));
   }
 };
-
-
-
+  const financeTableData = [
+    { debitAmount: "1500.00", debitAccount: "حساب المشتريات", creditAmount: "1500.00", creditAccount: "الصندوق" },
+    { debitAmount: "2200.00", debitAccount: "المخزون", creditAmount: "2200.00", creditAccount: "البنك" },
+    { debitAmount: "500.00", debitAccount: "حساب الأدوية", creditAmount: "500.00", creditAccount: "الموردين" },
+    { debitAmount: "1000.00", debitAccount: "المصروفات العمومية", creditAmount: "1000.00", creditAccount: "الصندوق" },
+  ];
   return (
     <div className="header">
      <div className="four-sections-container"> 
@@ -418,8 +472,6 @@ const handleAddItems = async () => {
 
   </div>
 </div>
-
-
 <div className="section table-section">
   <div className="date-grid-container">
        <div className="radio-group">
@@ -534,8 +586,6 @@ const handleAddItems = async () => {
 )}
 
 </div>
-
-
   </div>
 </div>
 </div>
@@ -581,28 +631,15 @@ const handleAddItems = async () => {
   </ul>
 )}
 
-
-
         </div>
-
         <button className="action-button">جديد</button>
        <button
   type="button"
   onClick={handleAddItems}
-  className="action-button"
->
+  className="action-button">
   إضافة
 </button>
-{/* <button
-  type="button"
-  onClick={() => fetchItemData(itemCode)}
-  className="action-button"
->
-  بحث
-</button> */}
-
       </div>
-
       <div className="table-scroll-wrapper-2">
         <table className="data-grid-2">
           <thead>
@@ -690,54 +727,123 @@ const handleAddItems = async () => {
           </tbody>
         </table>
       </div>
-
-
-
-
 <div className="section-divider"></div>
      <div className="four-sections-container">
 <div className="section-2">
-  <div className="double-form-grid">
-    <label>الإجمالي</label>
+  
+{rows.map((row, idx) => (
+  <div key={idx} className="double-form-grid">
+    {/* الاجمالى */}
+    <label>الاجمالى</label>
     <div className="double-input">
-      <input type="text" name="total1" value={totalAfterDiscount} />
-      <input type="text" name="total2" />
+      <input
+        type="text"
+        name="total1"
+        value={row.total1}
+        onChange={(e) =>
+          handleTotalBox(idx, "total1", e.target.value)
+        }
+      />
+      <input
+        type="text"
+        name="total2"
+        value={row.total2}
+        onChange={(e) =>
+          handleTotalBox(idx, "total2", e.target.value)
+        }
+      />
     </div>
 
+    {/* الخصم */}
     <label>خصم</label>
     <div className="double-input">
-      <input type="text" name="discountMain" />
+      <input
+        type="text"
+        name="finalDiscountMain"
+        value={row.finalDiscountMain}
+        onChange={(e) =>
+          handleTotalBox(idx, "finalDiscountMain", e.target.value)
+        }
+      />
       <span className="symbol-outside">%</span>
-      <input type="text" name="discountSmall1" />
-      <input type="text" name="discountSmall2" />
+      <input
+        type="text"
+        name="finalDiscountSmall1"
+        value={row.finalDiscountSmall1}
+        readOnly
+      />
+      <input
+        type="text"
+        name="finalDiscountSmall2"
+        value={row.finalDiscountSmall2}
+        onChange={(e) =>
+          handleTotalBox(idx, "finalDiscountSmall2", e.target.value)
+        }
+      />
     </div>
 
+    {/* بعد الخصم */}
     <label>بعد الخصم</label>
     <div className="double-input">
-      <input type="text" name="afterDiscount1" />
-     
-    </div>
+      <input
+        type="text"
+        name="finalAfterDiscount"
+        value={row.finalAfterDiscount}
+        readOnly
+      />
+          </div>
 
-    <label>ضريبة</label>
-    <div className="double-input">
-      <input type="text" name="taxMain" />
-      <span className="symbol-outside">%</span>
-      <input type="text" name="taxSmall1" />
-    </div>
+          <label>ضريبة</label>
+          <div className="double-input">
+            <input
+              type="text"
+              name="finalTaxMain"
+              value={row.finalTaxMain}
+              onChange={(e) =>
+                handleTotalBox(idx, "finalTaxMain", e.target.value)
+              }
+            />
+            <span className="symbol-outside">%</span>
+            <input
+              type="text"
+              name="finalTaxSmall1"
+              value={row.finalTaxSmall1}
+              readOnly
+            />
+          </div>
 
-    <label>قيمة الفاتورة</label>
-    <div className="double-input">
-      <input type="text" name="invoiceValue1" />
-      
-    </div>
+          <label>قيمة الفاتورة</label>
+          <div className="double-input">
+            <input
+              type="text"
+              name="finalInvoiceValue"
+              value={row.finalInvoiceValue}
+              readOnly
+            />
+          </div>
 
-    <label>ض.خ. الإضافية</label>
-    <div className="double-input">
-      <input type="text" name="additionalTaxMain" />
-      <span className="symbol-outside">%</span>
-      <input type="text" name="additionalTaxSmall1" />
+          <label>ض.خ. الإضافية</label>
+          <div className="double-input">
+            <input
+              type="text"
+              name="finalAdditionalTaxMain"
+              value={row.finalAdditionalTaxMain}
+              onChange={(e) =>
+                handleTotalBox(idx, "finalAdditionalTaxMain", e.target.value)
+              }
+            />
+            <span className="symbol-outside">%</span>
+            <input
+              type="text"
+              name="finalAdditionalTaxSmall"
+              value={row.finalAdditionalTaxSmall}
+               readOnly
+              
+            />
     </div>
   </div>
+))}
+
 
   <button className="action-button-2">ترحيل</button>
 </div>
