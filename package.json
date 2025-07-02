@@ -10,7 +10,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "arabic-persian-reshaper": "^1.0.1",
+    "arabic-reshaper": "^1.1.0",
     "axios": "^1.10.0",
+    "bidi-js": "^1.0.3",
     "jspdf": "^3.0.1",
     "jspdf-autotable": "^5.0.2",
     "react": "^19.1.0",
