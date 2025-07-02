@@ -4,18 +4,24 @@ import React, { useState, useEffect } from "react";
 import "../styles/invoiceComponent.css"; 
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-
+import { generatePreviewPdf } from "./Pdfpage";
 
 
 const Invoice = () => {
-  // تعريف tableData مرتبط بـ useState
+ 
   const [tableData, setTableData] = useState([
     { tot_af: 100 },
     { tot_af: 150 },
     { tot_af: 50 },
   ]);
-
-  // حساب الإجمالي بعد الخصم تلقائيًا من tableData
+const totalQuantity = tableData.reduce((acc, item) => acc + (Number(item.qun) || 0), 0);
+const totalBonus = tableData.reduce((acc, item) => acc + (Number(item.bons) || 0), 0);
+const totalPrice = tableData.reduce((acc, item) => acc + (Number(item.price) || 0), 0);
+const totalDiscount = tableData.reduce(
+  (acc, item) => acc + ((Number(item.price) * (Number(item.dis1) || 0)) / 100),
+  0
+);
+  
   const totalAfterDiscount = tableData.reduce(
     (acc, item) => acc + (Number(item.tot_af) || 0),
     0
@@ -50,7 +56,7 @@ const Invoice = () => {
     },
   ]);
 
-  // تحديث total1 تلقائيًا من totalAfterDiscount
+  
   useEffect(() => {
     setRows((prevRows) =>
       prevRows.map((row) => ({
@@ -66,7 +72,7 @@ const handleTotalBox = (idx, field, value) => {
 
   row[field] = parseFloat(value) || 0;
 
-  // حساب الخصم وقيمة بعد الخصم تلقائيا عند تغيير نسبة الخصم أو الإجمالي
+
   if (field === "finalDiscountMain" || field === "total1") {
     row.finalDiscountSmall1 = parseFloat(
       ((row.total1 * row.finalDiscountMain) / 100).toFixed(2)
@@ -508,22 +514,23 @@ const handleAddItems = async () => {
         <th>القيمة</th>
         <th>بعد الخصم</th>
         <th>خصم نهائي</th>
+        <th>id</th>
       </tr>
     </thead>
     <tbody>
       {tableData.map((item, index) => (
         <tr 
-  key={index}
-  onContextMenu={(e) => {
-    e.preventDefault();
-    setContextMenu({
-      mouseX: e.clientX,
-      mouseY: e.clientY,
-      rowIndex: index,
-    });
-  }}>
-
-
+          key={index}
+          onContextMenu={(e) => {
+            e.preventDefault();
+            setContextMenu({
+              mouseX: e.clientX,
+              mouseY: e.clientY,
+              rowIndex: index,
+              rowId: item.id, // نمرر id هنا تلقائيًا للاستخدام في الحذف
+            });
+          }}
+        >
           <td>{item.name || "-"}</td>
           <td>{item.am_n || "-"}</td>
           <td>{item.qun || 0}</td>
@@ -538,55 +545,114 @@ const handleAddItems = async () => {
           <td>{item.tot || 0}</td>
           <td>{item.price_af || 0}</td>
           <td>{item.finalDiscount || 0}</td>
+          <td>{item.id || 0}</td>
         </tr>
       ))}
     </tbody>
   </table>
-{contextMenu && (
-  <div
-    style={{
-      position: "fixed",
-      top: contextMenu.mouseY,
-      left: contextMenu.mouseX,
-      backgroundColor: "white",
-      border: "1px solid #ccc",
-      borderRadius: "6px",
-      boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-      zIndex: 9999,
-      minWidth: "140px",
-      overflow: "hidden"
-    }}
-    onMouseLeave={() => setContextMenu(null)}
-  >
-    {[
-      { label: " حذف الصف", action: () => alert(`تم الضغط على حذف للصف رقم ${contextMenu.rowIndex + 1}`) },
-      { label: " معينة", action: () => navigate("/preview") },
-      { label: " طباعة الباركود", action: () => console.log("طباعة الباركود") },
-      { label: " حذف الكل", action: () => console.log("حذف الكل") },
-    ].map((item, idx) => (
-      <div
-        key={idx}
-        onClick={() => {
-          item.action();
-          setContextMenu(null);
-        }}
-        style={{
-          padding: "8px 12px",
-          cursor: "pointer",
-          fontSize: "14px",
-          borderBottom: idx !== 3 ? "1px solid #eee" : "none",
-          transition: "background 0.2s"
-        }}
-        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#f0f4ff"}
-        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "white"}
-      >
-        {item.label}
-      </div>
-    ))}
-  </div>
-)}
 
+  {contextMenu && (
+    <div
+      style={{
+        position: "fixed",
+        top: contextMenu.mouseY,
+        left: contextMenu.mouseX,
+        backgroundColor: "white",
+        border: "1px solid #ccc",
+        borderRadius: "6px",
+        boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+        zIndex: 9999,
+        minWidth: "140px",
+        overflow: "hidden"
+      }}
+      onMouseLeave={() => setContextMenu(null)}
+    >
+      {[
+        { 
+          label: " حذف الصف", 
+          action: async () => {
+            const id = contextMenu.rowId;
+            if (!id) {
+              alert("لا يوجد معرف للصف لحذفه.");
+              return;
+            }
+            if (!window.confirm(`هل أنت متأكد من حذف id رقم ${id}؟`)) {
+              return;
+            }
+            try {
+              await axios.delete(`https://www.istpos.somee.com/api/Stoc/delete-item/${id}`);
+              setTableData(prev =>
+                prev.filter(row => row.id !== id)
+              );
+              alert("✅ تم حذف الصف بنجاح.");
+            } catch (error) {
+              console.error("خطأ أثناء حذف الصف:", error);
+              alert("❌ حدث خطأ أثناء محاولة الحذف.");
+            }
+          } 
+        },
+        { 
+          label: " معاينة", 
+          action: () => {
+            generatePreviewPdf(tableData, {
+              totalQuantity,
+              totalBonus,
+              totalPrice,
+              totalDiscount,
+              totalAfterDiscount,
+              user: "أحمد محمد",
+              permissionDate: "2025-07-02",
+              client: "صيدلية النور",
+              subStore: "المخزن الفرعي 1"
+            });
+          } 
+        },
+        { 
+          label: " طباعة الباركود", 
+          action: () => {
+            alert("ميزة طباعة الباركود لم تُفعّل بعد.");
+          } 
+        },
+        { 
+          label: " حذف الكل", 
+          action: async () => {
+            if (!window.confirm("هل أنت متأكد من حذف جميع الصفوف؟")) {
+              return;
+            }
+            try {
+            
+              setTableData([]);
+              alert("✅ تم حذف جميع الصفوف بنجاح.");
+            } catch (error) {
+              console.error("خطأ أثناء حذف الكل:", error);
+              alert("❌ حدث خطأ أثناء محاولة حذف الكل.");
+            }
+          } 
+        },
+      ].map((item, idx) => (
+        <div
+          key={idx}
+          onClick={() => {
+            item.action();
+            setContextMenu(null);
+          }}
+          style={{
+            padding: "8px 12px",
+            cursor: "pointer",
+            fontSize: "14px",
+            borderBottom: idx !== 3 ? "1px solid #eee" : "none",
+            transition: "background 0.2s"
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#f0f4ff"}
+          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "white"}
+        >
+          {item.label}
+        </div>
+      ))}
+    </div>
+  )}
 </div>
+
   </div>
 </div>
 </div>
