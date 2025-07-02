@@ -139,7 +139,7 @@ const totalAfterDiscount = tableData.reduce((acc, item) => acc + (Number(item.to
         </div> 
 </div> 
         </div>
-<button
+{/* <button
   onClick={() => {
     generatePreviewPdf(tableData, {
       totalQuantity,
@@ -151,7 +151,7 @@ const totalAfterDiscount = tableData.reduce((acc, item) => acc + (Number(item.to
   }}
 >
   طباعة PDF
-</button>
+</button> */}
       </div>
      </div>
 
