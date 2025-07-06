@@ -5,23 +5,25 @@ import "../styles/invoiceComponent.css";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { generatePreviewPdf } from "./Pdfpage";
-
+import { generateFinancePdf } from "./generateFinancePdf";
 
 const Invoice = () => {
- 
+  const navigate = useNavigate();
+
+  // بيانات الجدول الرئيسية
   const [tableData, setTableData] = useState([
     { tot_af: 100 },
     { tot_af: 150 },
     { tot_af: 50 },
   ]);
-const totalQuantity = tableData.reduce((acc, item) => acc + (Number(item.qun) || 0), 0);
-const totalBonus = tableData.reduce((acc, item) => acc + (Number(item.bons) || 0), 0);
-const totalPrice = tableData.reduce((acc, item) => acc + (Number(item.price) || 0), 0);
-const totalDiscount = tableData.reduce(
-  (acc, item) => acc + ((Number(item.price) * (Number(item.dis1) || 0)) / 100),
-  0
-);
-  
+
+  const totalQuantity = tableData.reduce((acc, item) => acc + (Number(item.qun) || 0), 0);
+  const totalBonus = tableData.reduce((acc, item) => acc + (Number(item.bons) || 0), 0);
+  const totalPrice = tableData.reduce((acc, item) => acc + (Number(item.price) || 0), 0);
+  const totalDiscount = tableData.reduce(
+    (acc, item) => acc + ((Number(item.price) * (Number(item.dis1) || 0)) / 100),
+    0
+  );
   const totalAfterDiscount = tableData.reduce(
     (acc, item) => acc + (Number(item.tot_af) || 0),
     0
@@ -55,8 +57,25 @@ const totalDiscount = tableData.reduce(
       finalAdditionalTaxSmall: 0,
     },
   ]);
+  const [sec_contextMenu, sec_setContextMenu] = useState(null);
+  const [contextMenu, setContextMenu] = useState(null);
+  const [fromMainStores, setFromMainStores] = useState([]);
+  const [fromSelectedMainStore, setFromSelectedMainStore] = useState("");
+  const [fromSubStores, setFromSubStores] = useState([]);
+  const [fromSelectedSubStore, setFromSelectedSubStore] = useState("");
 
-  
+  const [toMainStores, setToMainStores] = useState([]);
+  const [toSelectedMainStore, setToSelectedMainStore] = useState("");
+  const [toSubStores, setToSubStores] = useState([]);
+  const [toSelectedSubStore, setToSelectedSubStore] = useState("");
+
+  const [clientData, setClientData] = useState([]);
+  const [SelectedClient, setSelectedClient] = useState("");
+
+  const [itemCode, setItemCode] = useState("");
+  const [itemName, setItemName] = useState("");
+  const [nameSuggestions, setNameSuggestions] = useState([]);
+
   useEffect(() => {
     setRows((prevRows) =>
       prevRows.map((row) => ({
@@ -66,236 +85,206 @@ const totalDiscount = tableData.reduce(
     );
   }, [totalAfterDiscount]);
 
-const handleTotalBox = (idx, field, value) => {
-  const updatedRows = [...rows];
-  const row = updatedRows[idx];
-
-  row[field] = parseFloat(value) || 0;
-
-
-  if (field === "finalDiscountMain" || field === "total1") {
-    row.finalDiscountSmall1 = parseFloat(
-      ((row.total1 * row.finalDiscountMain) / 100).toFixed(2)
-    );
-    row.finalAfterDiscount = parseFloat(
-      (row.total1 - row.finalDiscountSmall1).toFixed(2)
-    );
-  }
-   if (field === "finalTaxMain" || field === "total1") {
-    row.finalTaxSmall1= parseFloat(
-      ((row.total1 * row.finalTaxMain) / 100).toFixed(2)
-    );
-      row.finalInvoiceValue = parseFloat(
-      (row.finalAfterDiscount + row.finalTaxSmall1).toFixed(2)
-    );
-  }
-  
-   if (field === "finalAdditionalTaxMain" || field === "total1") {
-    row.  finalAdditionalTaxSmall= parseFloat(
-      ((row.total1 * row.finalAdditionalTaxMain) / 100).toFixed(2)
-    );
-
-  }
-  setRows(updatedRows);
-};
-
-    const handleProductChange = (index, field, value) => {
-    const updatedRows = [...rows];
-    updatedRows[index] = {
-      ...updatedRows[index],
-      [field]: field === "unit" ? value : parseFloat(value) || 0,
+  useEffect(() => {
+    const fetchFromStores = async () => {
+      try {
+        if (fromMainStores.length === 0) {
+          const res1 = await axios.get("https://www.istpos.somee.com/api/Stoc/stoc1");
+          setFromMainStores(res1.data);
+        }
+        if (fromSelectedMainStore) {
+          const res = await axios.get(
+            `https://www.istpos.somee.com/api/Stoc/stoc2?name1=${encodeURIComponent(fromSelectedMainStore)}`
+          );
+          setFromSubStores(res.data);
+        } else {
+          setFromSubStores([]);
+        }
+      } catch (e) {
+        console.error("❌ خطأ في تحميل بيانات المخازن (من):", e);
+      }
     };
+    fetchFromStores();
+  }, [fromSelectedMainStore]);
 
+  useEffect(() => {
+    const fetchToStores = async () => {
+      try {
+        if (toMainStores.length === 0) {
+          const res1 = await axios.get("https://www.istpos.somee.com/api/Stoc/stoc1");
+          setToMainStores(res1.data);
+        }
+        if (toSelectedMainStore) {
+          const res = await axios.get(
+            `https://www.istpos.somee.com/api/Stoc/stoc2?name1=${encodeURIComponent(toSelectedMainStore)}`
+          );
+          setToSubStores(res.data);
+        } else {
+          setToSubStores([]);
+        }
+      } catch (e) {
+        console.error("❌ خطأ في تحميل بيانات المخازن (إلى):", e);
+      }
+    };
+    fetchToStores();
+  }, [toSelectedMainStore]);
+
+useEffect(() => {
+  const fetchInitialData = async () => {
+    try {
+      const params = {
+        mang_n: "العيادات بالمركز الرئيسي",
+        sav_flg: 0,
+        user_n: "احمد محمد",
+        stoc_lev1: fromSelectedMainStore, 
+        stoc_lev2: fromSelectedSubStore,  
+        type: "مبيعات"
+      };
+
+      const queryString = new URLSearchParams(params).toString();
+
+      const res = await axios.get(`https://www.istpos.somee.com/api/Stoc/stoc_items_trans?${queryString}`);
+      setTableData(res.data);
+    } catch (e) {
+      console.error("❌ خطأ في تحميل بيانات الأصناف:", e);
+    }
+  };
+
+  fetchInitialData();
+}, [fromSelectedMainStore, fromSelectedSubStore]);
+
+
+  useEffect(() => {
+    const fetchClients = async () => {
+      try {
+        const res = await axios.get("https://www.istpos.somee.com/api/client/client");
+        setClientData(res.data);
+      } catch (e) {
+        console.error("❌ خطأ في تحميل بيانات العملاء:", e);
+      }
+    };
+    fetchClients();
+  }, []);
+
+  const handleTotalBox = (idx, field, value) => {
+    const updatedRows = [...rows];
+    const row = updatedRows[idx];
+
+    row[field] = parseFloat(value) || 0;
+
+    if (field === "finalDiscountMain" || field === "total1") {
+      row.finalDiscountSmall1 = parseFloat(
+        ((row.total1 * row.finalDiscountMain) / 100).toFixed(2)
+      );
+      row.finalAfterDiscount = parseFloat(
+        (row.total1 - row.finalDiscountSmall1).toFixed(2)
+      );
+    }
+    if (field === "finalTaxMain" || field === "total1") {
+      row.finalTaxSmall1 = parseFloat(
+        ((row.total1 * row.finalTaxMain) / 100).toFixed(2)
+      );
+      row.finalInvoiceValue = parseFloat(
+        (row.finalAfterDiscount + row.finalTaxSmall1).toFixed(2)
+      );
+    }
+    if (field === "finalAdditionalTaxMain" || field === "total1") {
+      row.finalAdditionalTaxSmall = parseFloat(
+        ((row.total1 * row.finalAdditionalTaxMain) / 100).toFixed(2)
+      );
+    }
+    setRows(updatedRows);
+  };
+
+  const handleProductChange = (index, field, value) => {
+    const updatedRows = [...rows];
     const row = updatedRows[index];
+
+    row[field] = field === "unit" ? value : parseFloat(value) || 0;
     row.priceBeforeDiscount = row.price;
     row.discountValue = (row.price * row.discountPercent) / 100;
     row.afterDiscount = row.price - row.discountValue;
     row.valueBeforeDiscount = row.price * row.quantity;
-    row.value = row.afterDiscount * row.quantity;
+    row.value = row.price * row.quantity;
 
     setRows(updatedRows);
   };
 
-  const navigate = useNavigate();
-  const [contextMenu, setContextMenu] = useState(null); 
-  const [fromMainStores, setFromMainStores] = useState([]);
-  const [fromSelectedMainStore, setFromSelectedMainStore] = useState("");
-  const [fromSubStores, setFromSubStores] = useState([]);
-
-
-  const [toMainStores, setToMainStores] = useState([]);
-  const [toSelectedMainStore, setToSelectedMainStore] = useState("");
-  const [toSubStores, setToSubStores] = useState([]);
-  const [clientData, setClientData] = useState([]);
-  const [SelectedClient, setSelectedClient] = useState("");
-
-  const [itemCode, setItemCode] = useState("");
-  const [itemName, setItemName] = useState("");
-
-  const [nameSuggestions, setNameSuggestions] = useState([]);
-
-
-useEffect(() => {
-  const fetchFromStores = async () => {
-    try {
-      if (fromMainStores.length === 0) {
-        const response = await axios.get("https://www.istpos.somee.com/api/Stoc/stoc1");
-        setFromMainStores(response.data);
-      }
-      if (fromSelectedMainStore) {
-        const response = await axios.get(
-          `https://www.istpos.somee.com/api/Stoc/stoc2?name1=${encodeURIComponent(fromSelectedMainStore)}`
-        );
-        setFromSubStores(response.data);
-      } else {
-        setFromSubStores([]);
-      }
-    } catch (error) {
-      console.error("❌ خطأ في تحميل بيانات المخازن (من):", error);
-    }
-  };
-
-  fetchFromStores();
-}, [fromSelectedMainStore]);
-
-useEffect(() => {
-  const fetchToStores = async () => {
-    try {
-      if (toMainStores.length === 0) {
-        const response = await axios.get("https://www.istpos.somee.com/api/Stoc/stoc1");
-        setToMainStores(response.data);
-      }
-      if (toSelectedMainStore) {
-        const response = await axios.get(
-          `https://www.istpos.somee.com/api/Stoc/stoc2?name1=${encodeURIComponent(toSelectedMainStore)}`
-        );
-        setToSubStores(response.data);
-      } else {
-        setToSubStores([]);
-      }
-    } catch (error) {
-      console.error("❌ خطأ في تحميل بيانات المخازن (إلى):", error);
-    }
-  };
-
-  fetchToStores();
-}, [toSelectedMainStore]);
-
-useState(() => {
-  const fetchInitialData = async () => {
-    
-      const response = await axios.get(
-        "https://www.istpos.somee.com/api/Stoc/stoc_items_trans"
-      );
-
-      setTableData(response.data);
-
-  };
-
-  fetchInitialData(); 
-}, []);
-
-useState(() => {
-  const fetchClientData = async () => {
-    
-      const response = await axios.get(
-        "https://www.istpos.somee.com/api/client/client"
-      );
-
-      setClientData(response.data);
-
-  };
-
-  fetchClientData(); 
-}, [clientData]);
-
-const handleCodeChange = (e) => {
+  const handleCodeChange = (e) => {
     setItemCode(e.target.value);
-};
-const handleNameChange = async (e) => {
-  const value = e.target.value;
-  setItemName(value);
+  };
 
-  if (value.trim() === "") {
-    setNameSuggestions([]);
-    return;
-  }
+  const handleNameChange = async (e) => {
+    const value = e.target.value;
+    setItemName(value);
 
-  try {
-    const response = await axios.get(`https://www.istpos.somee.com/api/items/items`);
-    const filteredData = response.data.filter(item =>
-      item.name && item.name.startsWith(value)
-    );
-
-    setNameSuggestions(filteredData);
-  } catch (error) {
-    console.error("Error fetching item name suggestions:", error);
-    setNameSuggestions([]);
-  }
-};
-
-
-const fetchItemData = async (code) => {
-  if (!code || code.trim() === "") {
-    alert("يرجى إدخال كود الصنف أولاً");
-    return;
-  }
-  try {
-    const response = await axios.get(
-      `https://www.istpos.somee.com/api/items/ItemPrice?code=${code}`
-    );
-
-    const fetchedData = response.data.map((item) => ({
-      Itemname: item.name || "",
-      unit: item.am_n || "كرتونة",
-      quantity: item.qun || 0,
-      price: item.sal || 0,
-      discountPercent: item.dis1 || 0,
-      discountValue: 0,
-      priceBeforeDiscount: 0,
-      valueBeforeDiscount: 0,
-      value: 0,
-      afterDiscount: 0,
-      finalDiscount: 0,
-      bonus: item.bons || 0,
-      checked: true, 
-    }));
-
-    setRows(fetchedData);
-
-    if (response.data.length === 0) {
-      setItemName('')
-    }else if( response.data.length > 0) {
-      setItemName(response.data[0].name || "");
+    if (!value.trim()) {
+      setNameSuggestions([]);
+      return;
     }
-  } catch (error) {
-    console.error("Error fetching item data after selecting suggestion:", error);
-  }
-};
 
-const handleSelectSuggestion = async (selectedItem) => {
-  setItemName(selectedItem.name);
-  setItemCode(selectedItem.code);
-  setNameSuggestions([]); // إخفاء الـ panel بعد الاختيار
+    try {
+      const res = await axios.get("https://www.istpos.somee.com/api/items/items");
+      const filtered = res.data.filter((item) => item.name && item.name.startsWith(value));
+      setNameSuggestions(filtered);
+    } catch (e) {
+      console.error("❌ خطأ في جلب اقتراحات الأصناف:", e);
+      setNameSuggestions([]);
+    }
+  };
 
-  // استدعاء جلب بيانات الصنف مباشرة بعد اختيار الاسم
-  await fetchItemData(selectedItem.code);
-};
+  const handleSelectSuggestion = async (item) => {
+    setItemName(item.name);
+    setItemCode(item.code);
+    setNameSuggestions([]);
+    await fetchItemData(item.code);
+  };
+
+  const fetchItemData = async (code) => {
+    if (!code || code.trim() === "") {
+      alert("يرجى إدخال كود الصنف أولاً");
+      return;
+    }
+    try {
+      const res = await axios.get(`https://www.istpos.somee.com/api/items/ItemPrice?code=${code}`);
+      const fetched = res.data.map((item) => ({
+        Itemname: item.name || "",
+        unit: item.am_n || "كرتونة",
+        quantity: item.qun || 0,
+        price: item.sal || 0,
+        discountPercent: item.dis1 || 0,
+        discountValue: 0,
+        priceBeforeDiscount: 0,
+        valueBeforeDiscount: 0,
+        value: 0,
+        afterDiscount: 0,
+        finalDiscount: 0,
+        bonus: item.bons || 0,
+        checked: true,
+      }));
+      setRows(fetched);
+      if (res.data.length === 0) {
+        setItemName('');
+      } else if (res.data.length > 0) {
+        setItemName(res.data[0].name || "");
+      }
+    } catch (e) {
+      console.error("❌ خطأ في جلب بيانات الصنف:", e);
+    }
+  };
 
 const handleAddItems = async () => {
   try {
     for (const row of rows) {
-    
       if (!row.checked) {
-        console.log(`🚫 الصف ${row.Itemname || row.code} غير محدد - لن تتم إضافته`);
+        console.log(`✏️ الصف ${row.Itemname || row.code} غير محدد`);
         continue;
       }
-
       const payload = {
-        stoc_lev1: "string",
-        stoc_lev2: "string",
-        mang_n: "string",
-        type: "string",
+        stoc_lev1: fromSelectedMainStore,
+        stoc_lev2: fromSelectedSubStore,
+        mang_n: "العيادات بالمركز الرئيسي",
+        type: "المبيعات",
         move_type: "string",
         stoc_lev1_t: "string",
         stoc_lev2_t: "string",
@@ -328,7 +317,7 @@ const handleAddItems = async () => {
         req_no: 0,
         sat_num: 0,
         esl_gr: "string",
-        user_n: "string",
+        user_n: "احمد محمد",
         qun_flg: 0,
         type_no: 0,
         cost_tot: 0,
@@ -345,37 +334,50 @@ const handleAddItems = async () => {
         year_no: new Date().getFullYear(),
         exp_date_flg: 0,
         mins_flg: 0,
+        dis_price: row.discountValue || 0,  // ✅ مضاف مسبقاً
+
+        // ✅ إضافة dis لحل الخطأ الحالي
+        dis: row.discountValue || 0,       // أرسل القيمة نفسها أو 0
       };
 
-      console.log("🚩 Sending payload:", payload);
-
+      console.log("📡 Sending payload:", payload);
       await axios.post(
         "https://www.istpos.somee.com/api/Stoc/insert_stoc_items_trans",
         payload
       );
-
       console.log("✅ تم إضافة الصنف بنجاح");
     }
 
-    const response = await axios.get(
-      "https://www.istpos.somee.com/api/Stoc/stoc_items_trans"
-    );
+  const params = {
+    mang_n: "العيادات بالمركز الرئيسي",
+    sav_flg: 0,
+    user_n: "احمد محمد",
+    stoc_lev1: fromSelectedMainStore, 
+    stoc_lev2: fromSelectedSubStore,  
+    type: "مبيعات"
+  };
 
-    console.log("✅ تم جلب بيانات الأصناف:", response.data);
-    setTableData(response.data);
+  const queryString = new URLSearchParams(params).toString();
 
-    alert("✅ تم ترحيل الأصناف وجلب البيانات بنجاح");
-  } catch (error) {
-    console.error("❌ خطأ أثناء إضافة البيانات أو الجلب:", error.response?.data || error);
-    alert(JSON.stringify(error.response?.data?.errors || error.response?.data || error));
-  }
+  const res = await axios.get(`https://www.istpos.somee.com/api/Stoc/stoc_items_trans?${queryString}`);
+  setTableData(res.data);
+  alert("✅ تم ترحيل الأصناف بنجاح");
+} catch (e) {
+  console.error("❌ خطأ أثناء الترحيل:", e.response?.data || e);
+  alert(JSON.stringify(e.response?.data?.errors || e.response?.data || e));
+}
 };
+
+
   const financeTableData = [
     { debitAmount: "1500.00", debitAccount: "حساب المشتريات", creditAmount: "1500.00", creditAccount: "الصندوق" },
     { debitAmount: "2200.00", debitAccount: "المخزون", creditAmount: "2200.00", creditAccount: "البنك" },
     { debitAmount: "500.00", debitAccount: "حساب الأدوية", creditAmount: "500.00", creditAccount: "الموردين" },
     { debitAmount: "1000.00", debitAccount: "المصروفات العمومية", creditAmount: "1000.00", creditAccount: "الصندوق" },
   ];
+
+
+
   return (
     <div className="header">
      <div className="four-sections-container"> 
@@ -441,7 +443,9 @@ const handleAddItems = async () => {
   </div>
   <div className="select-row">
     <label>المخزن الفرعي</label>
-    <select name="subStoreFrom">
+    <select name="subStoreFrom"
+    value={fromSelectedSubStore}
+     onChange={(e) => setFromSelectedSubStore(e.target.value)}>
       <option value="">اختر</option>
       {fromSubStores.map((store, idx) => (
         <option key={idx} value={store.name}>{store.name}</option>
@@ -482,7 +486,7 @@ const handleAddItems = async () => {
 <div className="section table-section">
   <div className="date-grid-container">
        <div className="radio-group">
-      <input type="text" name="dafterNumber" placeholder="المبيعات"/>
+      <input type="text" name="type-text" value="المبيعات"/>
       <label className="radio-option">
         <input type="radio" name="status" value="registered" />
         مسجل
@@ -527,7 +531,7 @@ const handleAddItems = async () => {
               mouseX: e.clientX,
               mouseY: e.clientY,
               rowIndex: index,
-              rowId: item.id, // نمرر id هنا تلقائيًا للاستخدام في الحذف
+              rowId: item.id, 
             });
           }}
         >
@@ -594,17 +598,18 @@ const handleAddItems = async () => {
         { 
           label: " معاينة", 
           action: () => {
-            generatePreviewPdf(tableData, {
-              totalQuantity,
-              totalBonus,
-              totalPrice,
-              totalDiscount,
-              totalAfterDiscount,
-              user: "أحمد محمد",
-              permissionDate: "2025-07-02",
-              client: "صيدلية النور",
-              subStore: "المخزن الفرعي 1"
-            });
+generatePreviewPdf(tableData, {
+  totalQuantity,
+  totalBonus,
+  totalPrice,
+  totalDiscount,
+  totalAfterDiscount,
+  user: "أحمد محمد",
+  permissionDate: "2025-07-02",
+  client: "صيدلية النور",
+  subStore: "المخزن الفرعي 1"
+});
+
           } 
         },
         { 
@@ -917,8 +922,8 @@ const handleAddItems = async () => {
 
 
 
- <div className="section table-section"> 
- <div className="date-grid-container-3">
+<div className="section table-section">
+  <div className="date-grid-container-3">
     <div className="table-scroll-wrapper-3">
       <table className="data-grid-3">
         <thead>
@@ -931,7 +936,18 @@ const handleAddItems = async () => {
         </thead>
         <tbody>
           {financeTableData.map((item, index) => (
-            <tr key={index}>
+            <tr
+              key={index}
+              onContextMenu={(e) => {
+                e.preventDefault();
+                sec_setContextMenu({
+                  mouseX: e.clientX,
+                  mouseY: e.clientY,
+                  rowIndex: index,
+                  data: item,
+                });
+              }}
+            >
               <td>{item.debitAmount}</td>
               <td>{item.debitAccount}</td>
               <td>{item.creditAmount}</td>
@@ -941,10 +957,61 @@ const handleAddItems = async () => {
         </tbody>
       </table>
 
-
+      {sec_contextMenu && (
+        <div
+          style={{
+            position: "fixed",
+            top: sec_contextMenu.mouseY,
+            left: sec_contextMenu.mouseX,
+            backgroundColor: "white",
+            border: "1px solid #ccc",
+            borderRadius: "6px",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+            zIndex: 9999,
+            minWidth: "140px",
+            overflow: "hidden",
+          }}
+          onMouseLeave={() => sec_setContextMenu(null)}
+        >
+          {[
+            {
+              label: "طباعة",
+              action: () => {
+                // ✅ استدعاء الطباعة مباشرة للقيد المحدد
+                generateFinancePdf(
+                  [sec_contextMenu.data], // يتم الطباعة للصف المحدد فقط
+                  {
+                    user: JSON.parse(localStorage.getItem("userData"))?.username || "مستخدم",
+                    date: new Date().toLocaleDateString("ar-EG")
+                  }
+                );
+              },
+            },
+          ].map((item, idx) => (
+            <div
+              key={idx}
+              onClick={() => {
+                item.action();
+                sec_setContextMenu(null);
+              }}
+              style={{
+                padding: "8px 12px",
+                cursor: "pointer",
+                fontSize: "14px",
+                borderBottom: idx !== 2 ? "1px solid #eee" : "none",
+                transition: "background 0.2s",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#f0f4ff")}
+              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "white")}
+            >
+              {item.label}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
-    </div>
- </div>  
+  </div>
+</div>
   </div> 
  </div>        
   );
