@@ -3,12 +3,11 @@
 import React, { useState, useEffect } from "react";
 import "../styles/invoiceComponent.css"; 
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 import { generatePreviewPdf } from "./Pdfpage";
 import { generateFinancePdf } from "./generateFinancePdf";
+import { toast } from 'react-toastify';
 
 const Invoice = () => {
-  const navigate = useNavigate();
 
   // بيانات الجدول الرئيسية
   const [tableData, setTableData] = useState([
@@ -67,7 +66,6 @@ const Invoice = () => {
   const [toMainStores, setToMainStores] = useState([]);
   const [toSelectedMainStore, setToSelectedMainStore] = useState("");
   const [toSubStores, setToSubStores] = useState([]);
-  const [toSelectedSubStore, setToSelectedSubStore] = useState("");
 
   const [clientData, setClientData] = useState([]);
   const [SelectedClient, setSelectedClient] = useState("");
@@ -348,24 +346,29 @@ const handleAddItems = async () => {
       console.log("✅ تم إضافة الصنف بنجاح");
     }
 
-  const params = {
-    mang_n: "العيادات بالمركز الرئيسي",
-    sav_flg: 0,
-    user_n: "احمد محمد",
-    stoc_lev1: fromSelectedMainStore, 
-    stoc_lev2: fromSelectedSubStore,  
-    type: "مبيعات"
-  };
+    const params = {
+      mang_n: "العيادات بالمركز الرئيسي",
+      sav_flg: 0,
+      user_n: "احمد محمد",
+      stoc_lev1: fromSelectedMainStore, 
+      stoc_lev2: fromSelectedSubStore,  
+      type: "مبيعات"
+    };
 
-  const queryString = new URLSearchParams(params).toString();
+    const queryString = new URLSearchParams(params).toString();
 
-  const res = await axios.get(`https://www.istpos.somee.com/api/Stoc/stoc_items_trans?${queryString}`);
-  setTableData(res.data);
-  alert("✅ تم ترحيل الأصناف بنجاح");
-} catch (e) {
-  console.error("❌ خطأ أثناء الترحيل:", e.response?.data || e);
-  alert(JSON.stringify(e.response?.data?.errors || e.response?.data || e));
-}
+    const res = await axios.get(`https://www.istpos.somee.com/api/Stoc/stoc_items_trans?${queryString}`);
+    setTableData(res.data);
+    toast.success("✅ تم ترحيل الأصناف بنجاح");
+  } catch (e) {
+      console.error("❌ خطأ أثناء الترحيل:", e.response?.data || e);
+      const msg =
+      e?.response?.data?.errors ??
+      e?.response?.data?.message ??
+      e?.message ??
+      "حدث خطأ غير متوقع";
+      toast.error(typeof msg === "string" ? msg : JSON.stringify(msg, null, 2));
+    }
 };
 
 
