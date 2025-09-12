@@ -16,14 +16,14 @@ function App() {
     return (
         <>
         <ToastContainer
-            position="top-right"
+            position="top-left"
             autoClose={4000}
             newestOnTop
             closeOnClick
             pauseOnFocusLoss
             draggable
             pauseOnHover
-            rtl
+            rtl={true}
             toastStyle={{ zIndex: 999999 }}
         />
             <Router>
