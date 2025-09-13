@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import "../styles/invoiceComponent.css";
 import axios from "axios";
 import { generatePreviewPdf } from "./Pdfpage";
 import { generateFinancePdf } from "./generateFinancePdf";
 import { toast } from "react-toastify";
+import ReusableDataGrid from "./DataTable";
 
 const Invoice = () => {
   // بيانات الجدول الرئيسية
@@ -17,7 +18,7 @@ const Invoice = () => {
 
   const [rows, setRows] = useState([
     {
-      unit: "",
+      unit: "كرتونة",
       quantity: 0,
       price: 0,
       discountPercent: 0,
@@ -28,7 +29,59 @@ const Invoice = () => {
       afterDiscount: 0,
       finalDiscount: 0,
       bonus: 0,
-      Itemname: "",
+      Itemname: "الاسم",
+      checked: true,
+      total1: 0,
+      total2: 0,
+      finalDiscountMain: 0,
+      finalDiscountSmall1: 0,
+      finalDiscountSmall2: 0,
+      finalAfterDiscount: 0,
+      finalTaxMain: 0,
+      finalTaxSmall1: 0,
+      finalInvoiceValue: 0,
+      finalAdditionalTaxMain: 0,
+      finalAdditionalTaxSmall: 0,
+    },
+    {
+      unit: "علبة",
+      quantity: 0,
+      price: 0,
+      discountPercent: 0,
+      discountValue: 0,
+      priceBeforeDiscount: 0,
+      valueBeforeDiscount: 0,
+      value: 0,
+      afterDiscount: 0,
+      finalDiscount: 0,
+      bonus: 0,
+      Itemname: "الاسم",
+      checked: true,
+      total1: 0,
+      total2: 0,
+      finalDiscountMain: 0,
+      finalDiscountSmall1: 0,
+      finalDiscountSmall2: 0,
+      finalAfterDiscount: 0,
+      finalTaxMain: 0,
+      finalTaxSmall1: 0,
+      finalInvoiceValue: 0,
+      finalAdditionalTaxMain: 0,
+      finalAdditionalTaxSmall: 0,
+    },
+    {
+      unit: "شريط",
+      quantity: 0,
+      price: 0,
+      discountPercent: 0,
+      discountValue: 0,
+      priceBeforeDiscount: 0,
+      valueBeforeDiscount: 0,
+      value: 0,
+      afterDiscount: 0,
+      finalDiscount: 0,
+      bonus: 0,
+      Itemname: "الاسم",
       checked: true,
       total1: 0,
       total2: 0,
@@ -43,6 +96,127 @@ const Invoice = () => {
       finalAdditionalTaxSmall: 0,
     },
   ]);
+
+  // build selected keys from your `checked` flag (index-based if no id)
+  const selectedKeys = useMemo(() => {
+    const s = new Set();
+    rows.forEach((r, i) => {
+      if (r.checked) s.add(r.id ?? i);
+    });
+    return s;
+  }, [rows]);;
+
+  // columns (editable where your inputs were)
+  const columnsTable2 = useMemo(
+    () => [
+      { key: "Itemname", header: "الصنف" },
+      { key: "unit", header: "الوحدة" },
+      { key: "quantity", header: "الكمية", editable: true, inputType: "number" },
+      { key: "bonus", header: "بونص", editable: true, inputType: "number" },
+      { key: "price", header: "السعر", editable: true, inputType: "number" },
+      {
+        key: "discountPercent",
+        header: "نسبة الخصم",
+        editable: true,
+        inputType: "number",
+      },
+      {
+        key: "discountValue",
+        header: "قيمة الخصم",
+        compute: (r) => ((+r.price || 0) * (+r.discountPercent || 0)) / 100,
+        format: (v) => (v ?? 0).toFixed(2),
+      },
+      {
+        key: "priceBeforeDiscount",
+        header: "سعر قبل الخصم",
+        format: (v) => (v ?? 0).toFixed(2),
+      },
+      {
+        key: "valueBeforeDiscount",
+        header: "قيمة قبل الخصم",
+        format: (v) => (v ?? 0).toFixed(2),
+      },
+      { key: "value", header: "القيمة", format: (v) => (v ?? 0).toFixed(2) },
+      {
+        key: "afterDiscount",
+        header: "بعد الخصم",
+        format: (v) => (v ?? 0).toFixed(2),
+      },
+      {
+        key: "finalDiscount",
+        header: "خصم نهائي",
+        format: (v) => (v ?? 0).toFixed(2),
+      },
+    ],
+    []
+  );
+
+  // mirrors your handleProductChange + keeps derived fields in sync
+  const handleEdit = (rowIndex , key, next) => {
+    const updated = rows.slice();
+    const cur = { ...updated[rowIndex] };
+
+    // coerce numerics for these keys
+    const numericKeys = new Set(["quantity", "bonus", "price", "discountPercent"]);
+    cur[key] = numericKeys.has(key) ? Number(next) : next;
+
+    const quantity = +cur.quantity || 0;
+    const price = +cur.price || 0;
+    const discountPercent = +cur.discountPercent || 0;
+
+    const priceBeforeDiscount = price;
+    const discountValue = (priceBeforeDiscount * discountPercent) / 100;
+    const valueBeforeDiscount = priceBeforeDiscount * quantity;
+    const afterDiscount = priceBeforeDiscount - discountValue;
+    const value = quantity * afterDiscount;
+    const finalDiscount = discountValue; // adjust if you have extra rules
+
+    cur.priceBeforeDiscount = priceBeforeDiscount;
+    cur.discountValue = discountValue;
+    cur.valueBeforeDiscount = valueBeforeDiscount;
+    cur.afterDiscount = afterDiscount;
+    cur.value = value;
+    cur.finalDiscount = finalDiscount;
+
+    updated[rowIndex] = cur;
+    setRows(updated);
+  };
+
+
+  // per-row checkbox
+  const onToggleRow = (row, checked, idx) => {
+    const updated = rows.slice();
+    updated[idx] = { ...updated[idx], checked };
+    setRows(updated);
+  };
+
+  const columns = useMemo(() => [
+    { key: "name", header: "الصنف", width: 150 },
+    { key: "am_n", header: "الوحدة", width: 100 },
+    { key: "qun", header: "الكمية", width: 100, format: (v) => v ?? 0 },
+    { key: "bons", header: "بونص", width: 100, format: (v) => v ?? 0 },
+    { key: "tot_af", header: "القيمة بعد الخصم", width: 100, format: (v) => v ?? 0 },
+    { key: "code", header: "الكود" },
+    { key: "price", header: "السعر" },
+    { key: "dis1", header: "نسبة الخصم", format: (v) => `${v || 0}%` },
+    {
+      key: "discountValue",
+      header: "قيمة الخصم",
+      compute: (r) => ((r.price || 0) * (r.dis1 || 0)) / 100,
+      format: (v) => (v ?? 0).toFixed(2),
+    },
+    { key: "price", header: "سعر قبل الخصم" },
+    {
+      key: "valueBeforeDiscount",
+      header: "قيمة قبل الخصم",
+      compute: (r) => (r.price || 0) * (r.qun || 0),
+      format: (v) => (v ?? 0).toFixed(2),
+    },
+    { key: "tot", header: "القيمة" },
+    { key: "price_af", header: "بعد الخصم" },
+    { key: "finalDiscount", header: "خصم نهائي" },
+    { key: "id", header: "id" },
+  ], []);
   const [sec_contextMenu, sec_setContextMenu] = useState(null);
   const [contextMenu, setContextMenu] = useState(null);
   const [fromMainStores, setFromMainStores] = useState([]);
@@ -166,19 +340,6 @@ const Invoice = () => {
     setRows(updatedRows);
   };
 
-  const handleProductChange = (index, field, value) => {
-    const updatedRows = [...rows];
-    const row = updatedRows[index];
-
-    row[field] = field === "unit" ? value : parseFloat(value) || 0;
-    row.priceBeforeDiscount = row.price;
-    row.discountValue = (row.price * row.discountPercent) / 100;
-    row.afterDiscount = row.price - row.discountValue;
-    row.valueBeforeDiscount = row.price * row.quantity;
-    row.value = row.price * row.quantity;
-
-    setRows(updatedRows);
-  };
 
   const handleCodeChange = (e) => {
     setItemCode(e.target.value);
@@ -342,6 +503,15 @@ const Invoice = () => {
     { debitAmount: "500.00", debitAccount: "حساب الأدوية", creditAmount: "500.00", creditAccount: "الموردين" },
     { debitAmount: "1000.00", debitAccount: "المصروفات العمومية", creditAmount: "1000.00", creditAccount: "الصندوق" },
   ];
+  const columnsTable3 = useMemo(
+    () => [
+      { key: "debitAmount",  header: "المبلغ", format: (v) => Number(v ?? 0).toFixed(2) },
+      { key: "debitAccount", header: "الطرف المدين" },
+      { key: "creditAmount", header: "المبلغ", format: (v) => Number(v ?? 0).toFixed(2) },
+      { key: "creditAccount",header: "الطرف الدائن" },
+    ],
+    []
+  );
 
   return (
     <div className="header">
@@ -522,58 +692,23 @@ const Invoice = () => {
               </label>
             </div>
             <div className="table-scroll-wrapper">
-              <table className="data-grid">
-                <thead>
-                  <tr>
-                    <th style={{ width: "150px" }}>الصنف</th>
-                    <th style={{ width: "100px" }}>الوحدة</th>
-                    <th style={{ width: "100px" }}>الكمية</th>
-                    <th style={{ width: "100px" }}>بونص</th>
-                    <th style={{ width: "100px" }}>القيمة بعد الخصم</th>
-                    <th>الكود</th>
-                    <th>السعر</th>
-                    <th>نسبة الخصم</th>
-                    <th>قيمة الخصم</th>
-                    <th>سعر قبل الخصم</th>
-                    <th>قيمة قبل الخصم</th>
-                    <th>القيمة</th>
-                    <th>بعد الخصم</th>
-                    <th>خصم نهائي</th>
-                    <th>id</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {tableData.map((item, index) => (
-                    <tr
-                      key={index}
-                      onContextMenu={(e) => {
-                        e.preventDefault();
-                        setContextMenu({
-                          mouseX: e.clientX,
-                          mouseY: e.clientY,
-                          rowIndex: index,
-                          rowId: item.id,
-                        });
-                      }}>
-                      <td>{item.name || "-"}</td>
-                      <td>{item.am_n || "-"}</td>
-                      <td>{item.qun || 0}</td>
-                      <td>{item.bons || 0}</td>
-                      <td>{item.tot_af || 0}</td>
-                      <td>{item.code || "-"}</td>
-                      <td>{item.price || 0}</td>
-                      <td>{item.dis1 || 0}%</td>
-                      <td>{((item.price * (item.dis1 || 0)) / 100).toFixed(2)}</td>
-                      <td>{item.price || 0}</td>
-                      <td>{(item.price * item.qun).toFixed(2)}</td>
-                      <td>{item.tot || 0}</td>
-                      <td>{item.price_af || 0}</td>
-                      <td>{item.finalDiscount || 0}</td>
-                      <td>{item.id || 0}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <ReusableDataGrid
+                columns={columns}
+                rows={tableData}
+                rtl
+                stickyHeader
+                tableClassName="data-grid"
+                scrollWrapperClassName="table-scroll-wrapper"
+                onRowContextMenu={(e, row, index) => {
+                  e.preventDefault();
+                  setContextMenu({
+                    mouseX: e.clientX,
+                    mouseY: e.clientY,
+                    rowIndex: index,
+                    rowId: row?.id,
+                  });
+                }}
+              />
 
               {contextMenu && (
                 <div
@@ -722,89 +857,23 @@ const Invoice = () => {
           إضافة
         </button>
       </div>
-      <div className="table-scroll-wrapper-2">
-        <table className="data-grid-2">
-          <thead>
-            <tr>
-              <th>اختيار</th>
-              <th>الصنف</th>
-              <th>الوحدة</th>
-              <th>الكمية</th>
-              <th>بونص</th>
-              <th>السعر</th>
-              <th>نسبة الخصم</th>
-              <th>قيمة الخصم</th>
-              <th>سعر قبل الخصم</th>
-              <th>قيمة قبل الخصم</th>
-              <th>القيمة</th>
-              <th>بعد الخصم</th>
-              <th>خصم نهائي</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((row, index) => (
-              <tr key={index}>
-                <td>
-                  <input
-                    type="checkbox"
-                    checked={row.checked} // مربوط بالحالة
-                    onChange={(e) => {
-                      const updatedRows = [...rows];
-                      updatedRows[index].checked = e.target.checked;
-                      setRows(updatedRows);
-                    }}
-                  />
-                </td>
-
-                <td>{row.Itemname || "الاسم"}</td>
-                <td>{row.unit || "كرتونة"}</td>
-                <td>
-                  <input
-                    type="number"
-                    value={row.quantity}
-                    onChange={(e) => handleProductChange(index, "quantity", e.target.value)}
-                    className="table-input"
-                  />
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    value={row.bonus}
-                    onChange={(e) => handleProductChange(index, "bonus", e.target.value)}
-                    className="table-input"
-                  />
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    value={row.price}
-                    onChange={(e) => handleProductChange(index, "price", e.target.value)}
-                    className="table-input"
-                  />
-                </td>
-                <td>
-                  <input
-                    type="number"
-                    value={row.discountPercent}
-                    onChange={(e) => handleProductChange(index, "discountPercent", e.target.value)}
-                    className="table-input"
-                  />
-                </td>
-                <td>{row.discountValue.toFixed(2)}</td>
-                <td>{row.priceBeforeDiscount.toFixed(2)}</td>
-                <td>{row.valueBeforeDiscount.toFixed(2)}</td>
-                <td>{row.value.toFixed(2)}</td>
-                <td>{row.afterDiscount.toFixed(2)}</td>
-                <td>{row.finalDiscount.toFixed(2)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+        <ReusableDataGrid
+          columns={columnsTable2}
+          rows={rows}
+          rtl
+          stickyHeader
+          tableClassName="data-grid-2"
+          scrollWrapperClassName="table-scroll-wrapper-2"
+          selectionColumn={{ show: true, headerLabel: "اختيار" }}
+          selectedKeys={selectedKeys}
+          onToggleRow={onToggleRow}
+          onEdit={handleEdit}
+        />
+      
       <div className="section-divider"></div>
       <div className="four-sections-container">
         <div className="section-2">
-          {rows.map((row, idx) => (
+          {rows.slice(0,1).map((row, idx) => (
             <div
               key={idx}
               className="double-form-grid">
@@ -909,36 +978,23 @@ const Invoice = () => {
         <div className="section table-section">
           <div className="date-grid-container-3">
             <div className="table-scroll-wrapper-3">
-              <table className="data-grid-3">
-                <thead>
-                  <tr>
-                    <th>المبلغ</th>
-                    <th>الطرف المدين</th>
-                    <th>المبلغ</th>
-                    <th>الطرف الدائن</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {financeTableData.map((item, index) => (
-                    <tr
-                      key={index}
-                      onContextMenu={(e) => {
-                        e.preventDefault();
-                        sec_setContextMenu({
-                          mouseX: e.clientX,
-                          mouseY: e.clientY,
-                          rowIndex: index,
-                          data: item,
-                        });
-                      }}>
-                      <td>{item.debitAmount}</td>
-                      <td>{item.debitAccount}</td>
-                      <td>{item.creditAmount}</td>
-                      <td>{item.creditAccount}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <ReusableDataGrid
+                columns={columnsTable3}
+                rows={financeTableData}
+                rtl
+                stickyHeader
+                tableClassName="data-grid-3"
+                scrollWrapperClassName="table-scroll-wrapper-3"
+                onRowContextMenu={(e, row, index) => {
+                  e.preventDefault();
+                  sec_setContextMenu({
+                    mouseX: e.clientX,
+                    mouseY: e.clientY,
+                    rowIndex: index,
+                    data: row,
+                  });
+                }}
+              />
 
               {sec_contextMenu && (
                 <div
