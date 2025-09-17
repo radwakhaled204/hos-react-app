@@ -128,7 +128,7 @@ export default function ReusableDataGrid({
                 checked={allSelected}
                 onChange={(e) => onToggleAll && onToggleAll(e.target.checked)}
               />
-              {selectionColumn?.headerLabel || "اختيار"}
+              {selectionColumn?.headerLabel}
             </th>
           )}
           {columns.map((c, i) => (
@@ -170,7 +170,7 @@ export default function ReusableDataGrid({
   );
 
   return (
-    <div className={scrollWrapperClassName || "table-scroll-wrapper"} {...dirProps}>
+    <div style={{overflow:'auto'}} className={scrollWrapperClassName || "table-scroll-wrapper"} {...dirProps}>
       {stickyHeader ? (
         // Sticky header is done via CSS on thead th; wrapper just bounds height
         Table
