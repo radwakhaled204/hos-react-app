@@ -37,7 +37,7 @@ const menuItems = [
   {
     title: "مندوب البيع",
     items: [
-      { label: "مبيعات", path: "/invoice" },
+      { label: "مبيعات", path: "/invoice/home" },
       { label: "مردودات مبيعات", path: "#" },
       { label: "بيان أسعار", path: "#" },
       { label: "أمر توريد لعميل", path: "#" }
