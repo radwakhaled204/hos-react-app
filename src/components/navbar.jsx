@@ -61,7 +61,6 @@ const NavbarComponent = () => {
 
   return (
     <nav className="navbar" dir="rtl">
-      <div className="navbar-brand">نظام المبيعات</div>
       <div className="navbar-links">
         {menuItems.map((menu, index) => (
           <div
@@ -80,6 +79,7 @@ const NavbarComponent = () => {
           </div>
         ))}
       </div>
+      <div className="navbar-brand">نظام المبيعات</div>
     </nav>
   );
 };
