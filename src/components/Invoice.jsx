@@ -104,7 +104,7 @@ const Invoice = () => {
       if (r.checked) s.add(r.id ?? i);
     });
     return s;
-  }, [rows]);;
+  }, [rows]);
 
   // columns (editable where your inputs were)
   const columnsTable2 = useMemo(
@@ -152,7 +152,7 @@ const Invoice = () => {
   );
 
   // mirrors your handleProductChange + keeps derived fields in sync
-  const handleEdit = (rowIndex , key, next) => {
+  const handleEdit = (rowIndex, key, next) => {
     const updated = rows.slice();
     const cur = { ...updated[rowIndex] };
 
@@ -182,7 +182,6 @@ const Invoice = () => {
     setRows(updated);
   };
 
-
   // per-row checkbox
   const onToggleRow = (row, checked, idx) => {
     const updated = rows.slice();
@@ -190,33 +189,36 @@ const Invoice = () => {
     setRows(updated);
   };
 
-  const columns = useMemo(() => [
-    { key: "name", header: "الصنف", width: 150 },
-    { key: "am_n", header: "الوحدة", width: 100 },
-    { key: "qun", header: "الكمية", width: 100, format: (v) => v ?? 0 },
-    { key: "bons", header: "بونص", width: 100, format: (v) => v ?? 0 },
-    { key: "tot_af", header: "القيمة بعد الخصم", width: 100, format: (v) => v ?? 0 },
-    { key: "code", header: "الكود" },
-    { key: "price", header: "السعر" },
-    { key: "dis1", header: "نسبة الخصم", format: (v) => `${v || 0}%` },
-    {
-      key: "discountValue",
-      header: "قيمة الخصم",
-      compute: (r) => ((r.price || 0) * (r.dis1 || 0)) / 100,
-      format: (v) => (v ?? 0).toFixed(2),
-    },
-    { key: "price", header: "سعر قبل الخصم" },
-    {
-      key: "valueBeforeDiscount",
-      header: "قيمة قبل الخصم",
-      compute: (r) => (r.price || 0) * (r.qun || 0),
-      format: (v) => (v ?? 0).toFixed(2),
-    },
-    { key: "tot", header: "القيمة" },
-    { key: "price_af", header: "بعد الخصم" },
-    { key: "finalDiscount", header: "خصم نهائي" },
-    { key: "id", header: "id" },
-  ], []);
+  const columns = useMemo(
+    () => [
+      { key: "name", header: "الصنف", width: 150 },
+      { key: "am_n", header: "الوحدة", width: 100 },
+      { key: "qun", header: "الكمية", width: 100, format: (v) => v ?? 0 },
+      { key: "bons", header: "بونص", width: 100, format: (v) => v ?? 0 },
+      { key: "tot_af", header: "القيمة بعد الخصم", width: 100, format: (v) => v ?? 0 },
+      { key: "code", header: "الكود" },
+      { key: "price", header: "السعر" },
+      { key: "dis1", header: "نسبة الخصم", format: (v) => `${v || 0}%` },
+      {
+        key: "discountValue",
+        header: "قيمة الخصم",
+        compute: (r) => ((r.price || 0) * (r.dis1 || 0)) / 100,
+        format: (v) => (v ?? 0).toFixed(2),
+      },
+      { key: "price", header: "سعر قبل الخصم" },
+      {
+        key: "valueBeforeDiscount",
+        header: "قيمة قبل الخصم",
+        compute: (r) => (r.price || 0) * (r.qun || 0),
+        format: (v) => (v ?? 0).toFixed(2),
+      },
+      { key: "tot", header: "القيمة" },
+      { key: "price_af", header: "بعد الخصم" },
+      { key: "finalDiscount", header: "خصم نهائي" },
+      { key: "id", header: "id" },
+    ],
+    []
+  );
   const [sec_contextMenu, sec_setContextMenu] = useState(null);
   const [contextMenu, setContextMenu] = useState(null);
   const [fromMainStores, setFromMainStores] = useState([]);
@@ -234,6 +236,7 @@ const Invoice = () => {
   const [itemCode, setItemCode] = useState("");
   const [itemName, setItemName] = useState("");
   const [nameSuggestions, setNameSuggestions] = useState([]);
+  const [active, setActive] = useState("tab1");
 
   useEffect(() => {
     setRows((prevRows) =>
@@ -339,7 +342,6 @@ const Invoice = () => {
     }
     setRows(updatedRows);
   };
-
 
   const handleCodeChange = (e) => {
     setItemCode(e.target.value);
@@ -505,311 +507,16 @@ const Invoice = () => {
   ];
   const columnsTable3 = useMemo(
     () => [
-      { key: "debitAmount",  header: "المبلغ", format: (v) => Number(v ?? 0).toFixed(2) },
+      { key: "debitAmount", header: "المبلغ", format: (v) => Number(v ?? 0).toFixed(2) },
       { key: "debitAccount", header: "الطرف المدين" },
       { key: "creditAmount", header: "المبلغ", format: (v) => Number(v ?? 0).toFixed(2) },
-      { key: "creditAccount",header: "الطرف الدائن" },
+      { key: "creditAccount", header: "الطرف الدائن" },
     ],
     []
   );
 
   return (
     <div className="header">
-      <div className="four-sections-container">
-        <div className="section">
-          <div className="form-grid">
-            <label>رقم الفاتورة</label>
-            <input
-              type="text"
-              name="invoiceNumber"
-            />
-
-            <label>رقم الإذن</label>
-            <input
-              type="text"
-              name="permissionNumber"
-            />
-
-            <label>الكود</label>
-            <input
-              type="text"
-              name="client"
-            />
-            <label>رقم دفترى</label>
-            <input
-              type="text"
-              name="dafterNumber"
-            />
-            <label>من</label>
-            <input
-              type="date"
-              name="permissionDate1"
-            />
-          </div>
-        </div>
-        <div className="section">
-          <div className="form-grid-2">
-            <label>تاريخ الفاتورة</label>
-            <input
-              type="date"
-              name="invoiceDate"
-            />
-            <label>تاريخ الإذن</label>
-            <input
-              type="date"
-              name="permissionDate"
-            />
-
-            <label>العميل</label>
-            <select
-              name="client"
-              value={SelectedClient}
-              onChange={(e) => setSelectedClient(e.target.value)}>
-              {clientData.map((store, idx) => (
-                <option
-                  key={idx}
-                  value={store.name}>
-                  {store.name}
-                </option>
-              ))}
-            </select>
-            <label>المستلم</label>
-            <select name="receiver">
-              <option>اختر</option>
-              <option value="sub1">1</option>
-            </select>
-            <label>الى</label>
-            <input
-              type="date"
-              name="permissionDate2"
-            />
-          </div>
-        </div>
-        <div className="section card-section-dropdown">
-          <div className="form-grid-vertical">
-            <div className="box-container full-span">
-              <label style={{ textAlign: "center" }}>من</label>
-              <div className="select-row">
-                <label>المخزن الرئيسي</label>
-                <select
-                  name="mainStoreFrom"
-                  value={fromSelectedMainStore}
-                  onChange={(e) => setFromSelectedMainStore(e.target.value)}>
-                  <option value="">اختر</option>
-                  {fromMainStores.map((store, idx) => (
-                    <option
-                      key={idx}
-                      value={store.name}>
-                      {store.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="select-row">
-                <label>المخزن الفرعي</label>
-                <select
-                  name="subStoreFrom"
-                  value={fromSelectedSubStore}
-                  onChange={(e) => setFromSelectedSubStore(e.target.value)}>
-                  <option value="">اختر</option>
-                  {fromSubStores.map((store, idx) => (
-                    <option
-                      key={idx}
-                      value={store.name}>
-                      {store.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            <div className="box-container full-span">
-              <label style={{ textAlign: "center" }}>إلى</label>
-              <div className="select-row">
-                <label>المخزن الرئيسي</label>
-                <select
-                  name="mainStoreTo"
-                  value={toSelectedMainStore}
-                  onChange={(e) => setToSelectedMainStore(e.target.value)}>
-                  <option value="">اختر</option>
-                  {toMainStores.map((store, idx) => (
-                    <option
-                      key={idx}
-                      value={store.name}>
-                      {store.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="select-row">
-                <label>المخزن الفرعي</label>
-                <select name="subStoreTo">
-                  <option value="">اختر</option>
-                  {toSubStores.map((store, idx) => (
-                    <option
-                      key={idx}
-                      value={store.name}>
-                      {store.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="section table-section">
-          <div className="date-grid-container">
-            <div className="radio-group">
-              <input
-                type="text"
-                name="type-text"
-                value="المبيعات"
-              />
-              <label className="radio-option">
-                <input
-                  type="radio"
-                  name="status"
-                  value="registered"
-                />
-                مسجل
-              </label>
-              <label className="radio-option">
-                <input
-                  type="radio"
-                  name="status"
-                  value="canceled"
-                  defaultChecked
-                />
-                ملغى
-              </label>
-              <label className="radio-option">
-                <input
-                  type="radio"
-                  name="status"
-                  value="all"
-                />
-                الكل
-              </label>
-            </div>
-            <div className="table-scroll-wrapper">
-              <ReusableDataGrid
-                columns={columns}
-                rows={tableData}
-                rtl
-                stickyHeader
-                tableClassName="data-grid"
-                scrollWrapperClassName="table-scroll-wrapper"
-                onRowContextMenu={(e, row, index) => {
-                  e.preventDefault();
-                  setContextMenu({
-                    mouseX: e.clientX,
-                    mouseY: e.clientY,
-                    rowIndex: index,
-                    rowId: row?.id,
-                  });
-                }}
-              />
-
-              {contextMenu && (
-                <div
-                  style={{
-                    position: "fixed",
-                    top: contextMenu.mouseY,
-                    left: contextMenu.mouseX,
-                    backgroundColor: "white",
-                    border: "1px solid #ccc",
-                    borderRadius: "6px",
-                    boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-                    zIndex: 9999,
-                    minWidth: "140px",
-                    overflow: "hidden",
-                  }}
-                  onMouseLeave={() => setContextMenu(null)}>
-                  {[
-                    {
-                      label: " حذف الصف",
-                      action: async () => {
-                        const id = contextMenu.rowId;
-                        if (!id) {
-                          alert("لا يوجد معرف للصف لحذفه.");
-                          return;
-                        }
-                        if (!window.confirm(`هل أنت متأكد من حذف id رقم ${id}؟`)) {
-                          return;
-                        }
-                        try {
-                          await axios.delete(`https://www.istpos.somee.com/api/Stoc/delete-item/${id}`);
-                          setTableData((prev) => prev.filter((row) => row.id !== id));
-                          alert("✅ تم حذف الصف بنجاح.");
-                        } catch (error) {
-                          console.error("خطأ أثناء حذف الصف:", error);
-                          alert("❌ حدث خطأ أثناء محاولة الحذف.");
-                        }
-                      },
-                    },
-                    {
-                      label: " معاينة",
-                      action: () => {
-                        generatePreviewPdf(tableData, {
-                          totalQuantity,
-                          totalBonus,
-                          totalPrice,
-                          totalDiscount,
-                          totalAfterDiscount,
-                          user: "أحمد محمد",
-                          permissionDate: "2025-07-02",
-                          client: "صيدلية النور",
-                          subStore: "المخزن الفرعي 1",
-                        });
-                      },
-                    },
-                    {
-                      label: " طباعة الباركود",
-                      action: () => {
-                        alert("ميزة طباعة الباركود لم تُفعّل بعد.");
-                      },
-                    },
-                    {
-                      label: " حذف الكل",
-                      action: async () => {
-                        if (!window.confirm("هل أنت متأكد من حذف جميع الصفوف؟")) {
-                          return;
-                        }
-                        try {
-                          setTableData([]);
-                          alert("✅ تم حذف جميع الصفوف بنجاح.");
-                        } catch (error) {
-                          console.error("خطأ أثناء حذف الكل:", error);
-                          alert("❌ حدث خطأ أثناء محاولة حذف الكل.");
-                        }
-                      },
-                    },
-                  ].map((item, idx) => (
-                    <div
-                      key={idx}
-                      onClick={() => {
-                        item.action();
-                        setContextMenu(null);
-                      }}
-                      style={{
-                        padding: "8px 12px",
-                        cursor: "pointer",
-                        fontSize: "14px",
-                        borderBottom: idx !== 3 ? "1px solid #eee" : "none",
-                        transition: "background 0.2s",
-                      }}
-                      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#f0f4ff")}
-                      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "white")}>
-                      {item.label}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="section-divider"></div>
       <div className="form-row-inline">
         <div className="form-group-inline">
           <label htmlFor="itemCode">كود الصنف</label>
@@ -849,207 +556,539 @@ const Invoice = () => {
             </ul>
           )}
         </div>
-        <button className="action-button">جديد</button>
+        <button className="btn btn-primary px-4 ">جديد</button>
         <button
           type="button"
           onClick={handleAddItems}
-          className="action-button">
+          className="btn btn-primary px-4">
           إضافة
         </button>
       </div>
-        <ReusableDataGrid
-          columns={columnsTable2}
-          rows={rows}
-          rtl
-          stickyHeader
-          tableClassName="data-grid-2"
-          scrollWrapperClassName="table-scroll-wrapper-2"
-          selectionColumn={{ show: true, headerLabel: "اختيار" }}
-          selectedKeys={selectedKeys}
-          onToggleRow={onToggleRow}
-          onEdit={handleEdit}
-        />
-      
-      <div className="section-divider"></div>
-      <div className="four-sections-container">
-        <div className="section-2">
-          {rows.slice(0,1).map((row, idx) => (
-            <div
-              key={idx}
-              className="double-form-grid">
-              <label>الاجمالى</label>
-              <div className="double-input">
-                <input
-                  type="text"
-                  name="total1"
-                  value={row.total1}
-                  onChange={(e) => handleTotalBox(idx, "total1", e.target.value)}
-                />
-                <input
-                  type="text"
-                  name="total2"
-                  value={row.total2}
-                  onChange={(e) => handleTotalBox(idx, "total2", e.target.value)}
-                />
-              </div>
+      <ReusableDataGrid
+        columns={columnsTable2}
+        rows={rows}
+        rtl
+        stickyHeader
+        tableClassName="data-grid-2"
+        scrollWrapperClassName="table-scroll-wrapper-2"
+        selectionColumn={{ show: true }}
+        selectedKeys={selectedKeys}
+        onToggleRow={onToggleRow}
+        onEdit={handleEdit}
+      />
 
-              <label>خصم</label>
-              <div className="double-input">
-                <input
-                  type="text"
-                  name="finalDiscountMain"
-                  value={row.finalDiscountMain}
-                  onChange={(e) => handleTotalBox(idx, "finalDiscountMain", e.target.value)}
-                />
-                <span className="symbol-outside">%</span>
-                <input
-                  type="text"
-                  name="finalDiscountSmall1"
-                  value={row.finalDiscountSmall1}
-                  readOnly
-                />
-                <input
-                  type="text"
-                  name="finalDiscountSmall2"
-                  value={row.finalDiscountSmall2}
-                  onChange={(e) => handleTotalBox(idx, "finalDiscountSmall2", e.target.value)}
-                />
-              </div>
+      <div className="section-divider mt-3"></div>
+      <nav className="nav nav-pills nav-fill mb-3 mt-3 nav-">
+        <button
+          className={`nav-link ${active === "tab1" ? "active bg-info" : ""}`}
+          onClick={() => setActive("tab1")}>
+          الرئيسية
+        </button>
+        <button
+          className={`nav-link ${active === "tab2" ? "active bg-info" : ""}`}
+          onClick={() => setActive("tab2")}>
+          التقارير
+        </button>
+        <button
+          className={`nav-link ${active === "tab3" ? "active bg-info" : ""}`}
+          onClick={() => setActive("tab3")}>
+          الطلبات
+        </button>
+      </nav>
 
-              <label>بعد الخصم</label>
-              <div className="double-input">
-                <input
-                  type="text"
-                  name="finalAfterDiscount"
-                  value={row.finalAfterDiscount}
-                  readOnly
-                />
-              </div>
+       <div>
+        {/* Tab content */}
+        <div className="tab-content border rounded-3 p-3 bg-light">
+          {active === "tab1" && 
+          <>
+            <div className="four-sections-container">
+              <div className="section">
+                <div className="form-grid">
+                  <label>رقم الفاتورة</label>
+                  <input
+                    type="text"
+                    name="invoiceNumber"
+                  />
 
-              <label>ضريبة</label>
-              <div className="double-input">
-                <input
-                  type="text"
-                  name="finalTaxMain"
-                  value={row.finalTaxMain}
-                  onChange={(e) => handleTotalBox(idx, "finalTaxMain", e.target.value)}
-                />
-                <span className="symbol-outside">%</span>
-                <input
-                  type="text"
-                  name="finalTaxSmall1"
-                  value={row.finalTaxSmall1}
-                  readOnly
-                />
-              </div>
+                  <label>رقم الإذن</label>
+                  <input
+                    type="text"
+                    name="permissionNumber"
+                  />
 
-              <label>قيمة الفاتورة</label>
-              <div className="double-input">
-                <input
-                  type="text"
-                  name="finalInvoiceValue"
-                  value={row.finalInvoiceValue}
-                  readOnly
-                />
-              </div>
-
-              <label>ض.خ. الإضافية</label>
-              <div className="double-input">
-                <input
-                  type="text"
-                  name="finalAdditionalTaxMain"
-                  value={row.finalAdditionalTaxMain}
-                  onChange={(e) => handleTotalBox(idx, "finalAdditionalTaxMain", e.target.value)}
-                />
-                <span className="symbol-outside">%</span>
-                <input
-                  type="text"
-                  name="finalAdditionalTaxSmall"
-                  value={row.finalAdditionalTaxSmall}
-                  readOnly
-                />
-              </div>
-            </div>
-          ))}
-
-          <button className="action-button-2">ترحيل</button>
-        </div>
-
-        <div className="section table-section">
-          <div className="date-grid-container-3">
-            <div className="table-scroll-wrapper-3">
-              <ReusableDataGrid
-                columns={columnsTable3}
-                rows={financeTableData}
-                rtl
-                stickyHeader
-                tableClassName="data-grid-3"
-                scrollWrapperClassName="table-scroll-wrapper-3"
-                onRowContextMenu={(e, row, index) => {
-                  e.preventDefault();
-                  sec_setContextMenu({
-                    mouseX: e.clientX,
-                    mouseY: e.clientY,
-                    rowIndex: index,
-                    data: row,
-                  });
-                }}
-              />
-
-              {sec_contextMenu && (
-                <div
-                  style={{
-                    position: "fixed",
-                    top: sec_contextMenu.mouseY,
-                    left: sec_contextMenu.mouseX,
-                    backgroundColor: "white",
-                    border: "1px solid #ccc",
-                    borderRadius: "6px",
-                    boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-                    zIndex: 9999,
-                    minWidth: "140px",
-                    overflow: "hidden",
-                  }}
-                  onMouseLeave={() => sec_setContextMenu(null)}>
-                  {[
-                    {
-                      label: "طباعة",
-                      action: () => {
-                        // ✅ استدعاء الطباعة مباشرة للقيد المحدد
-                        generateFinancePdf(
-                          [sec_contextMenu.data], // يتم الطباعة للصف المحدد فقط
-                          {
-                            user: JSON.parse(localStorage.getItem("userData"))?.username || "مستخدم",
-                            date: new Date().toLocaleDateString("ar-EG"),
-                          }
-                        );
-                      },
-                    },
-                  ].map((item, idx) => (
-                    <div
-                      key={idx}
-                      onClick={() => {
-                        item.action();
-                        sec_setContextMenu(null);
-                      }}
-                      style={{
-                        padding: "8px 12px",
-                        cursor: "pointer",
-                        fontSize: "14px",
-                        borderBottom: idx !== 2 ? "1px solid #eee" : "none",
-                        transition: "background 0.2s",
-                      }}
-                      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#f0f4ff")}
-                      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "white")}>
-                      {item.label}
-                    </div>
-                  ))}
+                  <label>الكود</label>
+                  <input
+                    type="text"
+                    name="client"
+                  />
+                  <label>رقم دفترى</label>
+                  <input
+                    type="text"
+                    name="dafterNumber"
+                  />
+                  <label>من</label>
+                  <input
+                    type="date"
+                    name="permissionDate1"
+                  />
                 </div>
-              )}
+              </div>
+              <div className="section">
+                <div className="form-grid-2">
+                  <label>تاريخ الفاتورة</label>
+                  <input
+                    type="date"
+                    name="invoiceDate"
+                  />
+                  <label>تاريخ الإذن</label>
+                  <input
+                    type="date"
+                    name="permissionDate"
+                  />
+
+                  <label>العميل</label>
+                  <select
+                    name="client"
+                    value={SelectedClient}
+                    onChange={(e) => setSelectedClient(e.target.value)}>
+                    {clientData.map((store, idx) => (
+                      <option
+                        key={idx}
+                        value={store.name}>
+                        {store.name}
+                      </option>
+                    ))}
+                  </select>
+                  <label>المستلم</label>
+                  <select name="receiver">
+                    <option>اختر</option>
+                    <option value="sub1">1</option>
+                  </select>
+                  <label>الى</label>
+                  <input
+                    type="date"
+                    name="permissionDate2"
+                  />
+                </div>
+              </div>
+              <div className="w-100">
+                <div className="d-flex gap-2">
+                  <div className="box-container w-100">
+                    <label className="fw-bold text-center">من</label>
+                    <div className="select-row">
+                      <label className="fw-bold">المخزن الرئيسي</label>
+                      <select
+                        name="mainStoreFrom"
+                        value={fromSelectedMainStore}
+                        onChange={(e) => setFromSelectedMainStore(e.target.value)}>
+                        <option value="">اختر</option>
+                        {fromMainStores.map((store, idx) => (
+                          <option
+                            key={idx}
+                            value={store.name}>
+                            {store.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="select-row">
+                      <label className="fw-bold">المخزن الفرعي</label>
+                      <select
+                        name="subStoreFrom"
+                        value={fromSelectedSubStore}
+                        onChange={(e) => setFromSelectedSubStore(e.target.value)}>
+                        <option value="">اختر</option>
+                        {fromSubStores.map((store, idx) => (
+                          <option
+                            key={idx}
+                            value={store.name}>
+                            {store.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="box-container full-span">
+                    <label className="fw-bold text-center">إلى</label>
+                    <div className="select-row">
+                      <label className="fw-bold">المخزن الرئيسي</label>
+                      <select
+                        name="mainStoreTo"
+                        value={toSelectedMainStore}
+                        onChange={(e) => setToSelectedMainStore(e.target.value)}>
+                        <option value="">اختر</option>
+                        {toMainStores.map((store, idx) => (
+                          <option
+                            key={idx}
+                            value={store.name}>
+                            {store.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="select-row">
+                      <label className="fw-bold">المخزن الفرعي</label>
+                      <select name="subStoreTo">
+                        <option value="">اختر</option>
+                        {toSubStores.map((store, idx) => (
+                          <option
+                            key={idx}
+                            value={store.name}>
+                            {store.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
+              <div className="section table-section">
+                <div className="date-grid-container">
+                  <div className="radio-group">
+                    <input
+                      type="text"
+                      name="type-text"
+                      value="المبيعات"
+                    />
+                    <label className="radio-option">
+                      <input
+                        type="radio"
+                        name="status"
+                        value="registered"
+                      />
+                      مسجل
+                    </label>
+                    <label className="radio-option">
+                      <input
+                        type="radio"
+                        name="status"
+                        value="canceled"
+                        defaultChecked
+                      />
+                      ملغى
+                    </label>
+                    <label className="radio-option">
+                      <input
+                        type="radio"
+                        name="status"
+                        value="all"
+                      />
+                      الكل
+                    </label>
+                  </div>
+                  <div className="table-scroll-wrapper">
+                    <ReusableDataGrid
+                      columns={columns}
+                      rows={tableData}
+                      rtl
+                      stickyHeader
+                      tableClassName="data-grid"
+                      scrollWrapperClassName="table-scroll-wrapper"
+                      onRowContextMenu={(e, row, index) => {
+                        e.preventDefault();
+                        setContextMenu({
+                          mouseX: e.clientX,
+                          mouseY: e.clientY,
+                          rowIndex: index,
+                          rowId: row?.id,
+                        });
+                      }}
+                    />
+
+                    {contextMenu && (
+                      <div
+                        style={{
+                          position: "fixed",
+                          top: contextMenu.mouseY,
+                          left: contextMenu.mouseX,
+                          backgroundColor: "white",
+                          border: "1px solid #ccc",
+                          borderRadius: "6px",
+                          boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+                          zIndex: 9999,
+                          minWidth: "140px",
+                          overflow: "hidden",
+                        }}
+                        onMouseLeave={() => setContextMenu(null)}>
+                        {[
+                          {
+                            label: " حذف الصف",
+                            action: async () => {
+                              const id = contextMenu.rowId;
+                              if (!id) {
+                                alert("لا يوجد معرف للصف لحذفه.");
+                                return;
+                              }
+                              if (!window.confirm(`هل أنت متأكد من حذف id رقم ${id}؟`)) {
+                                return;
+                              }
+                              try {
+                                await axios.delete(`https://www.istpos.somee.com/api/Stoc/delete-item/${id}`);
+                                setTableData((prev) => prev.filter((row) => row.id !== id));
+                                alert("✅ تم حذف الصف بنجاح.");
+                              } catch (error) {
+                                console.error("خطأ أثناء حذف الصف:", error);
+                                alert("❌ حدث خطأ أثناء محاولة الحذف.");
+                              }
+                            },
+                          },
+                          {
+                            label: " معاينة",
+                            action: () => {
+                              generatePreviewPdf(tableData, {
+                                totalQuantity,
+                                totalBonus,
+                                totalPrice,
+                                totalDiscount,
+                                totalAfterDiscount,
+                                user: "أحمد محمد",
+                                permissionDate: "2025-07-02",
+                                client: "صيدلية النور",
+                                subStore: "المخزن الفرعي 1",
+                              });
+                            },
+                          },
+                          {
+                            label: " طباعة الباركود",
+                            action: () => {
+                              alert("ميزة طباعة الباركود لم تُفعّل بعد.");
+                            },
+                          },
+                          {
+                            label: " حذف الكل",
+                            action: async () => {
+                              if (!window.confirm("هل أنت متأكد من حذف جميع الصفوف؟")) {
+                                return;
+                              }
+                              try {
+                                setTableData([]);
+                                alert("✅ تم حذف جميع الصفوف بنجاح.");
+                              } catch (error) {
+                                console.error("خطأ أثناء حذف الكل:", error);
+                                alert("❌ حدث خطأ أثناء محاولة حذف الكل.");
+                              }
+                            },
+                          },
+                        ].map((item, idx) => (
+                          <div
+                            key={idx}
+                            onClick={() => {
+                              item.action();
+                              setContextMenu(null);
+                            }}
+                            style={{
+                              padding: "8px 12px",
+                              cursor: "pointer",
+                              fontSize: "14px",
+                              borderBottom: idx !== 3 ? "1px solid #eee" : "none",
+                              transition: "background 0.2s",
+                            }}
+                            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#f0f4ff")}
+                            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "white")}>
+                            {item.label}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+          </>
+          }
+          {active === "tab2" && 
+            <div className="four-sections-container">
+              <div className="section-2">
+                {rows.slice(0, 1).map((row, idx) => (
+                  <div
+                    key={idx}
+                    className="double-form-grid">
+                    <label>الاجمالى</label>
+                    <div className="double-input">
+                      <input
+                        type="text"
+                        name="total1"
+                        value={row.total1}
+                        onChange={(e) => handleTotalBox(idx, "total1", e.target.value)}
+                      />
+                      <input
+                        type="text"
+                        name="total2"
+                        value={row.total2}
+                        onChange={(e) => handleTotalBox(idx, "total2", e.target.value)}
+                      />
+                    </div>
+
+                    <label>خصم</label>
+                    <div className="double-input">
+                      <input
+                        type="text"
+                        name="finalDiscountMain"
+                        value={row.finalDiscountMain}
+                        onChange={(e) => handleTotalBox(idx, "finalDiscountMain", e.target.value)}
+                      />
+                      <span className="symbol-outside">%</span>
+                      <input
+                        type="text"
+                        name="finalDiscountSmall1"
+                        value={row.finalDiscountSmall1}
+                        readOnly
+                      />
+                      <input
+                        type="text"
+                        name="finalDiscountSmall2"
+                        value={row.finalDiscountSmall2}
+                        onChange={(e) => handleTotalBox(idx, "finalDiscountSmall2", e.target.value)}
+                      />
+                    </div>
+
+                    <label>بعد الخصم</label>
+                    <div className="double-input">
+                      <input
+                        type="text"
+                        name="finalAfterDiscount"
+                        value={row.finalAfterDiscount}
+                        readOnly
+                      />
+                    </div>
+
+                    <label>ضريبة</label>
+                    <div className="double-input">
+                      <input
+                        type="text"
+                        name="finalTaxMain"
+                        value={row.finalTaxMain}
+                        onChange={(e) => handleTotalBox(idx, "finalTaxMain", e.target.value)}
+                      />
+                      <span className="symbol-outside">%</span>
+                      <input
+                        type="text"
+                        name="finalTaxSmall1"
+                        value={row.finalTaxSmall1}
+                        readOnly
+                      />
+                    </div>
+
+                    <label>قيمة الفاتورة</label>
+                    <div className="double-input">
+                      <input
+                        type="text"
+                        name="finalInvoiceValue"
+                        value={row.finalInvoiceValue}
+                        readOnly
+                      />
+                    </div>
+
+                    <label>ض.خ. الإضافية</label>
+                    <div className="double-input">
+                      <input
+                        type="text"
+                        name="finalAdditionalTaxMain"
+                        value={row.finalAdditionalTaxMain}
+                        onChange={(e) => handleTotalBox(idx, "finalAdditionalTaxMain", e.target.value)}
+                      />
+                      <span className="symbol-outside">%</span>
+                      <input
+                        type="text"
+                        name="finalAdditionalTaxSmall"
+                        value={row.finalAdditionalTaxSmall}
+                        readOnly
+                      />
+                    </div>
+                  </div>
+                ))}
+
+                <div className="d-flex w-100 justify-content-center gap-2 mt-3">
+                  <button className="btn btn-primary px-4">ترحيل</button>
+                  <button className="btn btn-secondary px-4">الغاء</button>
+                </div>
+              </div>
+
+              <div className="section table-section">
+                <div className="date-grid-container-3">
+                  <div className="table-scroll-wrapper-3">
+                    <ReusableDataGrid
+                      columns={columnsTable3}
+                      rows={financeTableData}
+                      rtl
+                      stickyHeader
+                      tableClassName="data-grid-3"
+                      scrollWrapperClassName="table-scroll-wrapper-3"
+                      onRowContextMenu={(e, row, index) => {
+                        e.preventDefault();
+                        sec_setContextMenu({
+                          mouseX: e.clientX,
+                          mouseY: e.clientY,
+                          rowIndex: index,
+                          data: row,
+                        });
+                      }}
+                    />
+
+                    {sec_contextMenu && (
+                      <div
+                        style={{
+                          position: "fixed",
+                          top: sec_contextMenu.mouseY,
+                          left: sec_contextMenu.mouseX,
+                          backgroundColor: "white",
+                          border: "1px solid #ccc",
+                          borderRadius: "6px",
+                          boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+                          zIndex: 9999,
+                          minWidth: "140px",
+                          overflow: "hidden",
+                        }}
+                        onMouseLeave={() => sec_setContextMenu(null)}>
+                        {[
+                          {
+                            label: "طباعة",
+                            action: () => {
+                              // ✅ استدعاء الطباعة مباشرة للقيد المحدد
+                              generateFinancePdf(
+                                [sec_contextMenu.data], // يتم الطباعة للصف المحدد فقط
+                                {
+                                  user: JSON.parse(localStorage.getItem("userData"))?.username || "مستخدم",
+                                  date: new Date().toLocaleDateString("ar-EG"),
+                                }
+                              );
+                            },
+                          },
+                        ].map((item, idx) => (
+                          <div
+                            key={idx}
+                            onClick={() => {
+                              item.action();
+                              sec_setContextMenu(null);
+                            }}
+                            style={{
+                              padding: "8px 12px",
+                              cursor: "pointer",
+                              fontSize: "14px",
+                              borderBottom: idx !== 2 ? "1px solid #eee" : "none",
+                              transition: "background 0.2s",
+                            }}
+                            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#f0f4ff")}
+                            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "white")}>
+                            {item.label}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
         </div>
       </div>
+
+      
+
+      
+
+     
     </div>
   );
 };
