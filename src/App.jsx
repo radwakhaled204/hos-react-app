@@ -10,6 +10,7 @@ import Signup from "./components/Signup";
 import './App.css';
 import { ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
+import Sidebar from "./components/Sidebar";
 
 
 function App() {
@@ -34,7 +35,20 @@ function App() {
                     <Route path="/" element={<Login />} />
                     <Route path="/home" element={<NavbarComponent />} />
 
-                    <Route path="/invoice" element={<Invoice />} />
+                    <Route
+                        path="/invoice/*"
+                        element={
+                            <Sidebar>
+                            <Routes>
+                                <Route path="home" element={<Invoice />} />
+                                {/* <Route path="reports" element={<Invoice />}  /> */}
+                                {/* <Route path="settings" element={<InvoiceSettings />} /> */}
+                            </Routes>
+                            </Sidebar>
+                        }
+                        />
+
+                    {/* <Route path="/invoice" element={} /> */}
                     <Route path="/preview" element={<Preview />} />
                 </Routes>
             </Router>
