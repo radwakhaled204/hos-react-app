@@ -16,7 +16,7 @@ export function generatePreviewPdf(tableData, headerData) {
     const startY = 20;
     const lineHeight = 8;
 
-    // إضافة بيانات رأس الصفحة
+
     doc.text("معاينة حركة المبيعات", pageWidth / 2, startY, { align: "center" });
     doc.setFontSize(14);
     doc.text(`المستخدم: ${headerData.user || ""}`, pageWidth - 20, startY + lineHeight, { align: "right" });
