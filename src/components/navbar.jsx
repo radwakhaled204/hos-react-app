@@ -3,6 +3,14 @@ import { Link } from 'react-router-dom';
 import '../styles/NavbarComponent.css';
 
 const menuItems = [
+    {
+    title: "الحسابات العامة",
+    items: [
+      { label: " الشجره المحاسبية", path: "/Tree/home" },
+      { label: "عبوات صنف", path: "#" },
+
+    ]
+  },
   {
     title: "بناء النظام",
     items: [
