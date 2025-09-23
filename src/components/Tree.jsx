@@ -35,103 +35,110 @@
         ];
 
         return (
-            <div className="p-6 bg-gray-50">
+            <div className="p-4">
         
-            <div className="form-row-inline">
-                <div className="form-group-inline">
-                <label className="block mb-2 font-bold">نوع الحساب</label>
-                <Select
-                    options={accountData}
-                    value={accountSelect}
-                    onChange={setAccountSelect}
-                    placeholder="اختر الحساب..."
-                    isSearchable
-                />
-                </div>
-
-              <div className="form-group-inline">
-                <label className="block mb-2 font-bold">الفرع</label>
-                <Select
-                    options={branchData}
-                    value={branchSelect}
-                    onChange={setBranchSelect}
-                    placeholder="اختر الفرع..."
-                    isSearchable
-                />
-                </div>
+                <div className="form-row-inline container">
+                    <div className="form-group-inline">
+                    <label className="d-block mb-2 fw-bold">نوع الحساب</label>
+                    <Select
+                        options={accountData}
+                        value={accountSelect}
+                        onChange={setAccountSelect}
+                        placeholder="اختر الحساب..."
+                        isSearchable
+                    />
+                    </div>
 
                 <div className="form-group-inline">
-                <label className="block mb-2 font-bold">العملة</label>
-                <Select
-                    options={currencyData}
-                    value={currencySelect}
-                    onChange={setCurrencySelect}
-                    placeholder="اختر العملة..."
-                    isSearchable
-                />
-                </div>
-            </div>
+                    <label className="d-block mb-2 fw-bold">الفرع</label>
+                    <Select
+                        options={branchData}
+                        value={branchSelect}
+                        onChange={setBranchSelect}
+                        placeholder="اختر الفرع..."
+                        isSearchable
+                    />
+                    </div>
 
-            
-            <div className="border border-gray-400 rounded-lg p-4 bg-white shadow-sm">
-               
-                <div className="grid grid-cols-3 gap-4 text-center font-bold border-b pb-2 mb-3">
-                <div>نوع</div>
-                <div>مجمل ربح</div>
-                <div>خصم مسموح به</div>
+                    <div className="form-group-inline">
+                    <label className="d-block mb-2 fw-bold">العملة</label>
+                    <Select
+                        options={currencyData}
+                        value={currencySelect}
+                        onChange={setCurrencySelect}
+                        placeholder="اختر العملة..."
+                        isSearchable
+                    />
+                    </div>
                 </div>
 
                 
-                {rows.map((row, i) => (
-                <div
-                    key={i}
-                    className="grid grid-cols-3 gap-4 items-center text-center mb-2"
-                >
-                    <label className="flex items-center justify-center gap-2">
-                    <input type="checkbox" className="w-4 h-4" />
-                    {row.label}
-                    </label>
+                <div className="container p-5 bg-white mt-4">
+                
+                    <div className="d-flex gap-4 text-center fw-bold pb-2 mb-3">
+                        <div className="ms-3">نوع</div>
+                        <div className="me-4 pe-4 ms-4">مجمل ربح</div>
+                        <div className="me-5 pe-5">خصم مسموح به</div>
+                    </div>
 
-                    <input
-                    type="text"
-                    value={row.value}
-                    readOnly
-                    className="border rounded px-2 py-1 text-center w-full"
-                    />
+                    
+                    {rows.map((row, i) => (
+                    <div
+                        key={i}
+                        className="row my-2 gap-1"
+                    >
+                        <div className="col-1">
+                            <label>
+                            <input type="checkbox" className="" />
+                            {row.label}
+                            </label>
+                        </div>
 
-                    <select className="border rounded px-2 py-1 w-full">
-                    <option>{row.text}</option>
-                    </select>
+                        <div className="col-2">
+                            <input
+                            type="text"
+                            value={row.value}
+                            readOnly
+                            className="border rounded px-2 py-1 text-center form-control"
+                            />
+                        </div>
+
+                        <div className="col-8">
+                            <select className="border rounded px-2 py-1 form-select-row">
+                            <option>{row.text}</option>
+                            </select>
+                        </div>
+                    </div>
+                    ))}
+
+                
+                    <div className="mt-4 d-flex align-items-center gap-3 w-25">
+                        <span className="fw-bold ms-4 ps-2">الحساب</span>
+                        <input
+                            type="text"
+                            placeholder="مورّد نقدي"
+                            className="border rounded px-3 py-2 form-control"
+                        />
+                    </div>
                 </div>
-                ))}
-
-               
-                <div className="mt-4 flex items-center gap-3">
-                <span className="font-bold">الحساب</span>
-                <input
-                    type="text"
-                    placeholder="مورّد نقدي"
-                    className="border rounded px-3 py-2 flex-1"
-                />
-                </div>
-            </div>
-                    <nav className="nav nav-pills nav-fill mb-3 mt-3 nav-">
-            <button
-                className={`nav-link ${active === "tab1" ? "active bg-info" : ""}`}
-                onClick={() => setActive("tab1")}>
-                الرئيسية
-            </button>
-            <button
-                className={`nav-link ${active === "tab2" ? "active bg-info" : ""}`}
-                onClick={() => setActive("tab2")}>
-                الاجماليات
-            </button>
-            <button
-                className={`nav-link ${active === "tab3" ? "active bg-info" : ""}`}
-                onClick={() => setActive("tab3")}>
-                التقارير
-            </button>
-            </nav>
+                
+                <nav className="nav nav-pills nav-fill mb-3 mt-3 nav-">
+                    <button
+                        className={`nav-link ${active === "tab1" ? "active bg-info" : ""}`}
+                        onClick={() => setActive("tab1")}>
+                        الرئيسية
+                    </button>
+                    <button
+                        className={`nav-link ${active === "tab2" ? "active bg-info" : ""}`}
+                        onClick={() => setActive("tab2")}>
+                        الاجماليات
+                    </button>
+                    <button
+                        className={`nav-link ${active === "tab3" ? "active bg-info" : ""}`}
+                        onClick={() => setActive("tab3")}>
+                        التقارير
+                    </button>
+                </nav>
             </div>
         );
         }
