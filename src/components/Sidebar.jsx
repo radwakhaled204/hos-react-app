@@ -33,8 +33,8 @@ export default function Sidebar({ children }) {
         {/* Brand + Collapse toggle */}
         <div className="d-flex align-items-center justify-content-between p-3 border-bottom">
           <a href="/" className="d-flex align-items-center text-white text-decoration-none">
-            <i className="fa-solid fa-layer-group fa-lg"></i>
-            {!collapsed && <span className="fs-5 fw-bold ms-2">الشركة</span>}
+            {/* <i className="fa-solid fa-layer-group fa-lg"></i> */}
+            {!collapsed && <span className="fs-5 fw-bold ms-2">IST System</span>}
           </a>
           <button
             className="btn btn-sm btn-outline-light"
