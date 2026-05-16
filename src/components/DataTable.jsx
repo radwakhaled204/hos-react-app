@@ -83,6 +83,7 @@ export default function ReusableDataGrid({
 
     // Custom renderer takes precedence
     if (col.renderCell) return col.renderCell(row, rowIndex);
+    // If editable and onEdit provided, render editor
 
     // Editable cell
     if (col.editable && onEdit) {
